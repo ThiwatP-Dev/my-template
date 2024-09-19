@@ -10,19 +10,21 @@ public class DatabaseContext : DbContext
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
-    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-    public DbSet<Learner> Learners { get; set; }
-    public DbSet<Instructor> instructors { get; set; }
+    // public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    // public DbSet<Learner> Learners { get; set; }
+    // public DbSet<Instructor> instructors { get; set; }
+    public DbSet<Faculty> Faculties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
-        modelBuilder.ApplyConfiguration(new LearnerConfiguration());
-        modelBuilder.ApplyConfiguration(new InstructorConfiguration());
+        // modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+        // modelBuilder.ApplyConfiguration(new LearnerConfiguration());
+        // modelBuilder.ApplyConfiguration(new InstructorConfiguration());
+        modelBuilder.ApplyConfiguration(new FacultyConfiguration());
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Server=localhost,1433;Database=template;User Id=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;MultiSubnetFailover=True");
+        optionsBuilder.UseSqlServer("Server=THIWAT-ASUS\\SQLEXPRESS;Initial Catalog=plexus2;Persist Security Info=False;User ID=sa;Password=mrtoJGHToMLBaZdibrNf3pKc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
     }
 }
