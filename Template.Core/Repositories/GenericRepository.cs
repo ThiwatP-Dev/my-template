@@ -16,7 +16,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return entity;
     }
 
-    public async Task<IEnumerable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? predicate)
+    public async Task<IEnumerable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
         IQueryable<TEntity> query = _dbSet;
 
