@@ -4,9 +4,9 @@ using Template.Database.Models;
 
 namespace Template.Database.Configurations;
 
-public class InstructorConfiguration : IEntityTypeConfiguration<Instructor>
+public class LecturerConfiguration : IEntityTypeConfiguration<Lecturer>
 {
-    public void Configure(EntityTypeBuilder<Instructor> builder)
+    public void Configure(EntityTypeBuilder<Lecturer> builder)
     {
         builder.Property(x => x.Email)
                .HasMaxLength(500);

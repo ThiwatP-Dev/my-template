@@ -16,7 +16,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return entity;
     }
 
-    public async Task<IEnumerable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null)
     {
         IQueryable<TEntity> query = _dbSet;
 
@@ -25,7 +25,31 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
             query = query.Where(predicate);
         }
 
-        return await query.ToListAsync();
+        return query;
+    }
+
+    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    {
+        IQueryable<TEntity> query = _dbSet;
+
+        if (predicate is not null)
+        {
+            return await query.AnyAsync(predicate);
+        }
+
+        return await query.AnyAsync();
+    }
+
+    public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    {
+        IQueryable<TEntity> query = _dbSet;
+
+        if (predicate is not null)
+        {
+            return await query.CountAsync(predicate);
+        }
+
+        return await query.CountAsync();
     }
 
     public async Task<TEntity?> GetByIdAsync(object id)

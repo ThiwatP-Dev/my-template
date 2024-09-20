@@ -12,15 +12,15 @@ public class DatabaseContext : DbContext
 
     // public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     // public DbSet<Learner> Learners { get; set; }
-    // public DbSet<Instructor> instructors { get; set; }
-    public DbSet<Faculty> Faculties { get; set; }
+    // public DbSet<Lecturer> Lecturers { get; set; }
+    public DbSet<Institute> Institutes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         // modelBuilder.ApplyConfiguration(new LearnerConfiguration());
-        // modelBuilder.ApplyConfiguration(new InstructorConfiguration());
-        modelBuilder.ApplyConfiguration(new FacultyConfiguration());
+        // modelBuilder.ApplyConfiguration(new LecturerConfiguration());
+        modelBuilder.ApplyConfiguration(new InstituteConfiguration());
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -1,13 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using Template.Database.Enums;
+namespace Template.Service.Dto;
 
-namespace Template.Database.Models;
-
-[Table("ApplicationUsers")]
-public class ApplicationUser(Role role)
+public class CreateUserDto
 {
-    public Guid Id { get; set; }
-
     public required string Username { get; set; }
 
     public required string HashedPassword { get; set; }
@@ -19,6 +13,13 @@ public class ApplicationUser(Role role)
     public string? MiddleName { get; set; }
 
     public string? LastName { get; set; }
+}
 
-    public Role Role { get; set; } = role;
+public class CreateLearnerDto : CreateUserDto
+{
+    public required string Email { get; set; }
+
+    public required string PhoneNumber { get; set; }
+
+    public string? ProfileUrl { get; set; }
 }

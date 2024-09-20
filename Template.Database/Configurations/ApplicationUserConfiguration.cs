@@ -12,5 +12,8 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         
         builder.Property(x => x.Username)
                .HasMaxLength(500);
+        
+        builder.HasIndex(x => x.Username)
+               .IsUnique(true);
     }
 }
