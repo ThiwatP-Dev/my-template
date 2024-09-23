@@ -54,7 +54,13 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
 
     public async Task<TEntity?> GetByIdAsync(object id)
     {
-        TEntity? entity = await _dbSet.FindAsync(id);
+        var entity = await _dbSet.FindAsync(id);
+        return entity;
+    }
+
+    public async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        var entity = await _dbSet.SingleOrDefaultAsync(predicate);
         return entity;
     }
 
