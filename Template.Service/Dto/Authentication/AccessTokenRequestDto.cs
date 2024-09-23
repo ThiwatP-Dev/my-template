@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Template.Service.Dto;
+namespace Template.Service.Dto.Authentication;
 
 public class AccessTokenRequestDto
 {

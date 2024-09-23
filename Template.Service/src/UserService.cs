@@ -10,6 +10,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
 using Template.Service.Dto;
+using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
 
 namespace Template.Service.src;

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.Core.Constants;
-using Template.Service.Dto;
+using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
 
 namespace Template.API.Controllers.V1;
@@ -26,10 +26,10 @@ public class AuthController(IUserService userService) : BaseController
 
     [Authorize(AuthenticationSchemes = CustomAuthenticationSchemeConstant.ClientSecret)]
     [HttpPost("generate-super-admin")]
-    public async Task <IActionResult> InitSuperAdmin()
+    public async Task <IActionResult> GenerateSuperAdmin()
     {
         await _userService.GenerateSuperAdmin();
-        var location = Url.Action(nameof(InitSuperAdmin));
+        var location = Url.Action(nameof(GenerateSuperAdmin));
         return Created(location, null);
     }
 }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Template.Service.Dto;
+namespace Template.Service.Dto.Authentication;
 
 public class AccessTokenResponseDto
 {
@@ -12,7 +12,7 @@ public class AccessTokenResponseDto
 
     [JsonProperty("refreshToken")]
     public required string RefreshToken { get; set; }
-    
+
     [JsonProperty("expiredIn")]
     public int ExpiredIn { get; set; }
 }
