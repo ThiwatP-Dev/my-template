@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Template.API.Authentication;
+using Template.API.Configs;
+using Template.Core.Configs;
 using Template.Core.Constants;
 using Template.Database;
-using Template.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -28,6 +29,10 @@ services.AddApiVersioning(options =>
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+var jwtConfigurations = new JWTConfiguration();
+configuration.GetRequiredSection(JWTConfiguration.JWT)
+             .Bind(jwtConfigurations);
+
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
@@ -36,18 +41,22 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             options.TokenValidationParameters = new TokenValidationParameters()
             {
                 ValidateIssuer = true,
-                ValidIssuer = configuration["JWT:ValidIssuer"],
+                ValidIssuer = jwtConfigurations.ValidIssuer,
                 ValidateAudience = true,
-                ValidAudience = configuration["JWT:ValidAudience"],
+                ValidAudience = jwtConfigurations.ValidAudience,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]!))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfigurations.Secret))
             };
         });
+
+var secretKeySettings = new SecretKeyConfiguration();
+configuration.GetRequiredSection(SecretKeyConfiguration.ConfigurationSettings)
+             .Bind(secretKeySettings);
 
 services.AddAuthentication(CustomAuthenticationSchemeConstant.ClientSecret)
         .AddScheme<SecretKeyAuthenticationSchemeOptions, SecretKeyAuthenticationHandler>(CustomAuthenticationSchemeConstant.ClientSecret, options =>
         {
-            options.SecretKey = builder.Configuration["ClientSecretAuthenticationSetting:Key"]!;
+            options.SecretKey = secretKeySettings.Key;
         });
 
 services.AddAuthorizationBuilder()
@@ -55,6 +64,7 @@ services.AddAuthorizationBuilder()
                                                                                                 .Build());
 
 services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseContext")));
+services.AddConfigOption(configuration);
 services.AddInjection();
 
 services.AddCors(options =>

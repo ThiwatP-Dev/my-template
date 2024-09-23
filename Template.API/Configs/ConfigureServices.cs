@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+using Template.Core.Configs;
 using Template.Core.Repositories;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks;
@@ -6,7 +6,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Service.Interfaces;
 using Template.Service.src;
 
-namespace Template.Service;
+namespace Template.API.Configs;
 
 public static class ConfigureServices
 {
@@ -16,6 +16,13 @@ public static class ConfigureServices
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IInstituteService, InstitudeService>();
         services.AddScoped<IUserService, UserService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddConfigOption(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        services.Configure<JWTConfiguration>(configuration.GetSection(JWTConfiguration.JWT));
 
         return services;
     }
