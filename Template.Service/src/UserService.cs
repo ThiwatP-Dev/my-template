@@ -22,7 +22,7 @@ public class UserService(IUnitOfWork unitOfWork,
     private readonly IGenericRepository<ApplicationUser> _userRepository = unitOfWork.Repository<ApplicationUser>();
     private readonly IGenericRepository<Learner> _learnerRepository = unitOfWork.Repository<Learner>();
 
-    public async Task InitSuperAdmin()
+    public async Task GenerateSuperAdmin()
     {
         if (await _userRepository.AnyAsync(x => x.Role == Role.SUPER_ADMIN))
         {
@@ -78,7 +78,7 @@ public class UserService(IUnitOfWork unitOfWork,
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task<AccessTokenResponseDto> Login(string username, string password)
+    public async Task<AccessTokenResponseDto> LoginAsync(string username, string password)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
@@ -102,7 +102,7 @@ public class UserService(IUnitOfWork unitOfWork,
         return response;
     }
 
-    public async Task<AccessTokenResponseDto> Refresh(string token)
+    public async Task<AccessTokenResponseDto> RefreshAsync(string token)
     {
         var handler = new JwtSecurityTokenHandler();
 
