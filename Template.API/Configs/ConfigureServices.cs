@@ -23,6 +23,11 @@ public static class ConfigureServices
     public static IServiceCollection AddConfigOption(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.Configure<JWTConfiguration>(configuration.GetSection(JWTConfiguration.JWT));
+        services.Configure<GoogleClientConfiguration>(settings =>
+        {
+            var section = configuration.GetSection(GoogleClientConfiguration.Client);
+            settings.Audience = section.GetValue<string>(nameof(GoogleClientConfiguration.Audience))?.Split(",") ?? [];
+        });
 
         return services;
     }
