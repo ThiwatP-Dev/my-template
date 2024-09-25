@@ -7,7 +7,4 @@ public interface IUserService
 {
     Task GenerateSuperAdmin();
     Task CreateLearnerAsync(CreateLearnerDto request, Guid userId);
-    Task<AccessTokenResponseDto> LoginAsync(string username, string password);
-    Task<AccessTokenResponseDto> RefreshAsync(string token);
-    Task<AccessTokenResponseDto> LoginAsync(GoogleTokenRequestDto request);
 }

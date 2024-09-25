@@ -1,8 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Template.Core.Configs;
 using Template.Core.Extensions;
 using Template.Core.Repositories.Interfaces;
@@ -10,18 +6,13 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
 using Template.Service.Dto;
-using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
 
 namespace Template.Service.src;
 
-public partial class UserService(IUnitOfWork unitOfWork,
-                                 IOptions<JWTConfiguration> jwtConfigOptions,
-                                 IOptions<GoogleClientConfiguration> googleClientconfiguration) : IUserService
+public class UserService(IUnitOfWork unitOfWork) : IUserService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly JWTConfiguration _jwtConfig = jwtConfigOptions.Value;
-    private readonly GoogleClientConfiguration _googleClientConfig = googleClientconfiguration.Value;
     private readonly IGenericRepository<ApplicationUser> _userRepository = unitOfWork.Repository<ApplicationUser>();
     private readonly IGenericRepository<Learner> _learnerRepository = unitOfWork.Repository<Learner>();
 

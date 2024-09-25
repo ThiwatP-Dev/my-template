@@ -8,15 +8,17 @@ namespace Template.API.Controllers.V1;
 
 [ApiController]
 [Route(BaseUrl)]
-public class AuthController(IUserService userService) : BaseController
+public class AuthController(IAuthService authService,
+                            IUserService userService) : BaseController
 {
+    private readonly IAuthService _authService = authService;
     private readonly IUserService _userService = userService;
 
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] AccessTokenRequestDto request)
     {
-        var response = await _userService.LoginAsync(request.Username, request.Password);
+        var response = await _authService.LoginAsync(request.Username, request.Password);
 
         var userId = GetCurrentUser();
         
