@@ -6,5 +6,5 @@ public interface IAuthService
 {
     Task<AccessTokenResponseDto> LoginAsync(string username, string password);
     Task<AccessTokenResponseDto> RefreshAsync(string token);
-    Task<AccessTokenResponseDto> LoginAsync(GoogleTokenRequestDto request);
+    Task<AccessTokenResponseDto> LoginGoogleAsync(string token);
 }

@@ -26,6 +26,23 @@ public class AuthController(IAuthService authService,
         return Created(location, response);
     }
 
+    [AllowAnonymous]
+    [HttpPost("login/google")]
+    public async Task<IActionResult> LoginGoogleAsync()
+    {
+        if (!Request.Headers.TryGetValue("Authorization", out var authHeaderValue))
+        {
+            return Unauthorized();
+        }
+
+        var response = await _authService.LoginGoogleAsync(authHeaderValue!);
+
+        var userId = GetCurrentUser();
+        
+        var location = Url.Action(nameof(LoginAsync), new { id = userId }) ?? $"/{userId}";
+        return Created(location, response);
+    }
+
     [Authorize(AuthenticationSchemes = CustomAuthenticationSchemeConstant.ClientSecret)]
     [HttpPost("generate-super-admin")]
     public async Task <IActionResult> GenerateSuperAdmin()

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Template.Core.Configs;
@@ -85,9 +86,38 @@ public class AuthService(IUnitOfWork unitOfWork,
         return response;
     }
 
-    public async Task<AccessTokenResponseDto> LoginAsync(GoogleTokenRequestDto request)
+    public async Task<AccessTokenResponseDto> LoginGoogleAsync(string token)
     {
-        throw new NotImplementedException();
+        token = token.Replace("Bearer ", string.Empty);
+        var settings = new GoogleJsonWebSignature.ValidationSettings
+        {
+            Audience = _googleClientConfig.Audience,
+            IssuedAtClockTolerance = TimeSpan.FromSeconds(60)
+        };
+
+        try
+        {
+            var payload = await GoogleJsonWebSignature.ValidateAsync(token, settings);
+
+            if (payload is null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+            
+            var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(payload.Email));
+            if (user is null || string.IsNullOrEmpty(user.HashedPassword))
+            {
+                throw new KeyNotFoundException();
+            }
+
+            var response = GenerateUserToken(user);
+
+            return response;
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     private AccessTokenResponseDto GenerateUserToken(ApplicationUser user)
