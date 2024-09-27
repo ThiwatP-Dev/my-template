@@ -5,12 +5,12 @@ using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Template.Core.Configs;
-using Template.Core.Extensions;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
+using Template.Utility.Extensions;
 
 namespace Template.Service.src;
 

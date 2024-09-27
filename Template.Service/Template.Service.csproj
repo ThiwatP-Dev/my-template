@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Template.Core\Template.Core.csproj" />
+    <ProjectReference Include="..\Template.Utility\Template.Utility.csproj" />
   </ItemGroup>
 
   <ItemGroup>
