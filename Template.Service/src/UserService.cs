@@ -1,12 +1,10 @@
-using Microsoft.Extensions.Options;
-using Template.Core.Configs;
-using Template.Core.Extensions;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Extensions;
 
 namespace Template.Service.src;
 
