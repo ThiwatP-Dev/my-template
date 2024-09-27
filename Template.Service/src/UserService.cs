@@ -40,8 +40,14 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task CreateLearnerAsync(CreateLearnerDto request, Guid userId)
+    public async Task<Guid> CreateLearnerAsync(CreateLearnerDto request, Guid userId)
     {
+        var isUsernameExists = await _userRepository.AnyAsync(x => x.Username.Equals(request.Username));
+        if (isUsernameExists)
+        {
+            throw new InvalidOperationException();
+        }
+
         var learnerExists = await _learnerRepository.AnyAsync(x => x.Email.Equals(request.Email));
         if (learnerExists)
         {
@@ -52,7 +58,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         var hashkey = StringExtension.GenerateRandomString(10);
         var learner = new Learner
         {
-            Username = request.Email,
+            Username = request.Username,
             HashedKey = hashkey,
             HashedPassword = request.Password.HashHMACSHA256(hashkey),
             FirstName = request.FirstName,
@@ -70,6 +76,8 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
+
+        return learner.Id;
     }
 
     private async Task<string> GetLearnerCode()

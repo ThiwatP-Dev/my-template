@@ -6,5 +6,5 @@ namespace Template.Service.Interfaces;
 public interface IUserService
 {
     Task GenerateSuperAdmin();
-    Task CreateLearnerAsync(CreateLearnerDto request, Guid userId);
+    Task<Guid> CreateLearnerAsync(CreateLearnerDto request, Guid userId);
 }
