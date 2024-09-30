@@ -10,13 +10,13 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
     private readonly DatabaseContext _dbContext = dbContext;
     private readonly DbSet<TEntity> _dbSet = dbContext.Set<TEntity>();
 
-    public async Task<TEntity> CreateAsync(TEntity entity)
+    public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
         await _dbSet.AddAsync(entity);
         return entity;
     }
 
-    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null)
+    public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null)
     {
         IQueryable<TEntity> query = _dbSet;
 
@@ -28,7 +28,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return query;
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
         IQueryable<TEntity> query = _dbSet;
 
@@ -40,7 +40,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return await query.AnyAsync();
     }
 
-    public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
         IQueryable<TEntity> query = _dbSet;
 
@@ -64,13 +64,13 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return entity;
     }
 
-    public void Update(TEntity entity)
+    public virtual void Update(TEntity entity)
     {
         _dbSet.Attach(entity);
         _dbContext.Entry(entity).State = EntityState.Modified;
     }
 
-    public void Delete(TEntity entity)
+    public virtual void Delete(TEntity entity)
     {
         if (_dbContext.Entry(entity).State == EntityState.Detached)
         {
