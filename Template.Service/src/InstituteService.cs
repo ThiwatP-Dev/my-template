@@ -4,15 +4,16 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Extensions;
 
 namespace Template.Service.src;
 
-public class InstitudeService(IUnitOfWork unitOfWork) : IInstituteService
+public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGenericRepository<Institute> _instituteRepository = unitOfWork.Repository<Institute>();
 
-    public async Task CreateAsync(CreateInstituteDto request, Guid userId)
+    public async Task<Guid> CreateAsync(CreateInstituteDto request, Guid userId)
     {
         var institute = new Institute
         {
@@ -29,9 +30,11 @@ public class InstitudeService(IUnitOfWork unitOfWork) : IInstituteService
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
+
+        return institute.Id;
     }
 
-    public async Task<IEnumerable<InstituteDto>> GetAll()
+    public async Task<IEnumerable<InstituteDto>> GetAllAsync()
     {
         var institutes = await _instituteRepository.Query()
                                                    .ToListAsync();
@@ -47,7 +50,27 @@ public class InstitudeService(IUnitOfWork unitOfWork) : IInstituteService
         return response;
     }
 
-    public async Task<InstituteDto> GetById(Guid id)
+    public async Task<PagedDto<InstituteDto>> SearchAsync(int page = 1, int pageSize = 25)
+    {
+        var query = GenerateQuery();
+
+        var pagedInstitute = await query.GetPagedAsync(page, pageSize);
+
+        var response = new PagedDto<InstituteDto>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalPage = pagedInstitute.TotalPage,
+            TotalItem = pagedInstitute.TotalItem,
+            Items = (from item in pagedInstitute.Items
+                     select Map(item))
+                    .ToList()
+        };
+
+        return response;
+    }
+
+    public async Task<InstituteDto> GetByIdAsync(Guid id)
     {
         var institute = await _instituteRepository.GetByIdAsync(id);
 
@@ -101,5 +124,25 @@ public class InstitudeService(IUnitOfWork unitOfWork) : IInstituteService
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
+    }
+
+    private IQueryable<Institute> GenerateQuery()
+    {
+        var query = _instituteRepository.Query();
+
+        query = query.OrderBy(x => x.Name);
+
+        return query;
+    }
+
+    private static InstituteDto Map(Institute model)
+    {
+        var response = new InstituteDto
+        {
+            Id = model.Id,
+            Name = model.Name
+        };
+
+        return response;
     }
 }

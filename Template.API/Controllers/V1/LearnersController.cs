@@ -17,13 +17,13 @@ public class LearnersController(IUserService userService,
     {
         var userId = GetCurrentUser();
 
-        _logger.LogInformation("Create learner with username {username}", request.Username);
+        _logger.LogInformation("Create learner with username {username}.", request.Username);
 
         var learnerId = await _userService.CreateLearnerAsync(request, userId);
 
-        _logger.LogInformation("Learner created with id {learnerId}", learnerId);
+        _logger.LogInformation("Learner created with id {learnerId}.", learnerId);
         
-        var location = Url.Action(nameof(CreateAsync), new { id = learnerId }) ?? $"/{learnerId}";
+        var location = Url.Action(nameof(CreateAsync), new { id = learnerId });
         return Created(location, null);
     }
 }

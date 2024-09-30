@@ -14,7 +14,7 @@ public static class ConfigureServices
     {
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IInstituteService, InstitudeService>();
+        services.AddScoped<IInstituteService, InstituteService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
 
