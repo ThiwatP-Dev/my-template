@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
-using Template.Service.src;
 
 namespace Template.API.Controllers.V1;
 

@@ -1,5 +1,4 @@
 using Template.Service.Dto;
-using Template.Service.Dto.Authentication;
 
 namespace Template.Service.Interfaces;
 
