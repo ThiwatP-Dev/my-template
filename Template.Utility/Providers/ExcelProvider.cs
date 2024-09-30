@@ -26,7 +26,7 @@ public static class ExcelProvider
         return stream.ToArray();
     }
 
-    public static async Task<IEnumerable<IEnumerable<object>>> Read(IFormFile file, bool isContainHeaderRow)
+    public static async Task<IEnumerable<IEnumerable<object>>> ReadAsync(IFormFile file, bool isContainHeaderRow)
     {
         using var stream = new MemoryStream();
         
