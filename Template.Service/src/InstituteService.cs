@@ -63,7 +63,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             TotalPage = pagedInstitute.TotalPage,
             TotalItem = pagedInstitute.TotalItem,
             Items = (from item in pagedInstitute.Items
-                     select Map(item))
+                     select MapDto(item))
                     .ToList()
         };
 
@@ -135,7 +135,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
         return query;
     }
 
-    private static InstituteDto Map(Institute model)
+    private static InstituteDto MapDto(Institute model)
     {
         var response = new InstituteDto
         {
