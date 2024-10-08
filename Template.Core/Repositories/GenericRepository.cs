@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Template.Core.Repositories.Interfaces;
 using Template.Database;
@@ -14,6 +15,17 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
     {
         await _dbSet.AddAsync(entity);
         return entity;
+    }
+
+    public virtual async Task<IEnumerable<TEntity>> CreateRangeAsync(IEnumerable<TEntity> entities)
+    {
+        await _dbSet.AddRangeAsync(entities);
+        return entities;
+    }
+
+    public virtual async Task BulkCreateAsync(IEnumerable<TEntity> entities)
+    {
+        await _dbContext.BulkInsertAsync(entities);
     }
 
     public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null, bool isTracked = true)
@@ -74,5 +86,13 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         }
 
         _dbSet.Remove(entity);
+    }
+
+    public virtual void DeleleRange(IEnumerable<TEntity> entities)
+    {
+        foreach (var entity in entities)
+        {
+            Delete(entity);
+        }
     }
 }

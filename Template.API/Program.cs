@@ -63,7 +63,8 @@ services.AddAuthorizationBuilder()
         .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser()
                                                                                                 .Build());
 
-services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseContext")));
+services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseContext"),
+    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 services.AddConfigOption(configuration);
 services.AddInjection();
 services.AddClient();
