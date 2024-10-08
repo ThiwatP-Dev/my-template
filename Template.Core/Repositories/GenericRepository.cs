@@ -16,9 +16,9 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
         return entity;
     }
 
-    public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null)
+    public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? predicate = null, bool isTracked = true)
     {
-        IQueryable<TEntity> query = _dbSet;
+        var query = isTracked ? _dbSet : _dbSet.AsNoTracking();
 
         if (predicate is not null)
         {
@@ -30,7 +30,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
 
     public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
-        IQueryable<TEntity> query = _dbSet;
+        var query = _dbSet.AsNoTracking();
 
         if (predicate is not null)
         {
@@ -42,7 +42,7 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
 
     public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
-        IQueryable<TEntity> query = _dbSet;
+        var query = _dbSet.AsNoTracking();
 
         if (predicate is not null)
         {
@@ -55,19 +55,15 @@ public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRep
     public async Task<TEntity?> GetByIdAsync(object id)
     {
         var entity = await _dbSet.FindAsync(id);
+
         return entity;
     }
 
-    public async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    public async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool isTracked = true)
     {
-        var entity = await _dbSet.SingleOrDefaultAsync(predicate);
+        var query = isTracked ? _dbSet : _dbSet.AsNoTracking();
+        var entity = await query.SingleOrDefaultAsync(predicate);
         return entity;
-    }
-
-    public virtual void Update(TEntity entity)
-    {
-        _dbSet.Attach(entity);
-        _dbContext.Entry(entity).State = EntityState.Modified;
     }
 
     public virtual void Delete(TEntity entity)

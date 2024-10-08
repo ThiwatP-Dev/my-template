@@ -36,7 +36,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
     public async Task<IEnumerable<InstituteDto>> GetAllAsync()
     {
-        var institutes = await _instituteRepository.Query()
+        var institutes = await _instituteRepository.Query(isTracked: false)
                                                    .ToListAsync();
         
         var response = (from institute in institutes
@@ -97,13 +97,11 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             throw new KeyNotFoundException();
         }
 
+        await _unitOfWork.BeginTransactionAsync();
+
         institute.Name = request.Name;
         institute.UpdatedAt = DateTime.UtcNow;
         institute.UpdatedBy = userId;
-
-        await _unitOfWork.BeginTransactionAsync();
-
-        _instituteRepository.Update(institute);
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
@@ -128,7 +126,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
     private IQueryable<Institute> GenerateQuery()
     {
-        var query = _instituteRepository.Query();
+        var query = _instituteRepository.Query(isTracked: false);
 
         query = query.OrderBy(x => x.Name);
 

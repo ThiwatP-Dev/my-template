@@ -29,7 +29,7 @@ public class AuthService(IUnitOfWork unitOfWork,
             throw new InvalidOperationException();
         }
 
-        var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(username));
+        var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(username), false);
         if (user is null || string.IsNullOrEmpty(user.HashedPassword))
         {
             throw new KeyNotFoundException();
@@ -74,7 +74,7 @@ public class AuthService(IUnitOfWork unitOfWork,
             throw new UnauthorizedAccessException();
         }
 
-        var user = await _userRepository.SingleOrDefaultAsync(x => x.Id == userId);
+        var user = await _userRepository.SingleOrDefaultAsync(x => x.Id == userId, false);
 
         if (user is null)
         {
@@ -104,7 +104,7 @@ public class AuthService(IUnitOfWork unitOfWork,
                 throw new UnauthorizedAccessException();
             }
             
-            var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(payload.Email));
+            var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(payload.Email), false);
             if (user is null || string.IsNullOrEmpty(user.HashedPassword))
             {
                 throw new KeyNotFoundException();
