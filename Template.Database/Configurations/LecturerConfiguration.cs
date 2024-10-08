@@ -8,6 +8,7 @@ public class LecturerConfiguration : IEntityTypeConfiguration<Lecturer>
 {
     public void Configure(EntityTypeBuilder<Lecturer> builder)
     {
+        builder.ToTable("Lecturers");
         builder.Property(x => x.Email)
                .HasMaxLength(500);
     }

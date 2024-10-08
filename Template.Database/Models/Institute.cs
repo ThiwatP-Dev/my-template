@@ -1,8 +1,5 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Template.Database.Models;
 
-[Table("Institutes")]
 public class Institute
 {
     public Guid Id { get; set; }

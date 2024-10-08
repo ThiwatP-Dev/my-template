@@ -8,6 +8,7 @@ public class InstituteConfiguration : IEntityTypeConfiguration<Institute>
 {
     public void Configure(EntityTypeBuilder<Institute> builder)
     {
+        builder.ToTable("Institutes");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Name)

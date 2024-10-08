@@ -8,6 +8,7 @@ public class LearnerConfiguration : IEntityTypeConfiguration<Learner>
 {
     public void Configure(EntityTypeBuilder<Learner> builder)
     {
+        builder.ToTable("Learners");
         builder.Property(x => x.Code)
                .HasMaxLength(500);
 
@@ -19,7 +20,7 @@ public class LearnerConfiguration : IEntityTypeConfiguration<Learner>
 
         builder.HasIndex(x => x.Code)
                .IsUnique(true);
-        
+
         builder.HasIndex(x => x.Email)
                .IsUnique(true);
     }

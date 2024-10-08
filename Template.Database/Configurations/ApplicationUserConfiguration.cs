@@ -8,14 +8,15 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
+        builder.ToTable("ApplicationUsers");
         builder.HasKey(x => x.Id);
-        
+
         builder.Property(x => x.Username)
                .HasMaxLength(500);
-        
+
         builder.HasIndex(x => x.Username)
                .IsUnique(true);
-        
+
         builder.Property(x => x.Role)
                .HasConversion<string>()
                .HasMaxLength(100);

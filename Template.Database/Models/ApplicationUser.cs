@@ -1,9 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Template.Database.Enums;
 
 namespace Template.Database.Models;
 
-[Table("ApplicationUsers")]
 public class ApplicationUser(Role role)
 {
     public Guid Id { get; set; }
