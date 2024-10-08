@@ -3,6 +3,7 @@ using Template.Core.Repositories;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks;
 using Template.Core.UnitOfWorks.Interfaces;
+using Template.Service.Clients;
 using Template.Service.Interfaces;
 using Template.Service.src;
 
@@ -28,6 +29,19 @@ public static class ConfigureServices
         {
             var section = configuration.GetSection(GoogleClientConfiguration.Client);
             settings.Audience = section.GetValue<string>(nameof(GoogleClientConfiguration.Audience))?.Split(",") ?? [];
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddClient(this IServiceCollection services)
+    {
+        services.AddHttpClient();
+
+        services.AddHttpClient<TemplateClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.example.com/");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
 
         return services;

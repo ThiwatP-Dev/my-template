@@ -66,6 +66,7 @@ services.AddAuthorizationBuilder()
 services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseContext")));
 services.AddConfigOption(configuration);
 services.AddInjection();
+services.AddClient();
 
 services.AddCors(options =>
 {
