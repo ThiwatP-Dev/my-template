@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
@@ -8,10 +9,11 @@ using Template.Utility.Extensions;
 
 namespace Template.Service.src;
 
-public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
+public class InstituteService(IUnitOfWork unitOfWork, IMapper mapper) : IInstituteService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGenericRepository<Institute> _instituteRepository = unitOfWork.Repository<Institute>();
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Guid> CreateAsync(CreateInstituteDto request, Guid userId)
     {
@@ -63,7 +65,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             TotalPage = pagedInstitute.TotalPage,
             TotalItem = pagedInstitute.TotalItem,
             Items = (from item in pagedInstitute.Items
-                     select MapDto(item))
+                     select _mapper.Map<InstituteDto>(item))
                     .ToList()
         };
 
@@ -131,16 +133,5 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
         query = query.OrderBy(x => x.Name);
 
         return query;
-    }
-
-    private static InstituteDto MapDto(Institute model)
-    {
-        var response = new InstituteDto
-        {
-            Id = model.Id,
-            Name = model.Name
-        };
-
-        return response;
     }
 }

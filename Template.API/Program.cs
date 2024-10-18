@@ -9,6 +9,7 @@ using Template.API.Configs;
 using Template.Core.Configs;
 using Template.Core.Constants;
 using Template.Database;
+using Template.Service.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -79,6 +80,8 @@ services.AddCors(options =>
               .SetIsOriginAllowed(x => true);
     });
 });
+
+services.AddAutoMapper(typeof(InstituteProfile).Assembly);
 
 var app = builder.Build();
 

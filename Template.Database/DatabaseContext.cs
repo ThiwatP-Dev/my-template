@@ -17,10 +17,7 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
-        modelBuilder.ApplyConfiguration(new LearnerConfiguration());
-        modelBuilder.ApplyConfiguration(new LecturerConfiguration());
-        modelBuilder.ApplyConfiguration(new InstituteConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationUserConfiguration).Assembly);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
