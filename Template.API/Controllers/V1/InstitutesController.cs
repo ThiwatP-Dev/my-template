@@ -22,7 +22,7 @@ public class InstitutesController(IInstituteService instituteService,
         var instituteId = await _instituteService.CreateAsync(request, userId);
 
         _logger.LogInformation("Institute created with id {instituteId}.", instituteId);
-        
+
         var location = Url.Action(nameof(CreateAsync), new { id = instituteId });
         return Created(location, null);
     }
@@ -78,7 +78,7 @@ public class InstitutesController(IInstituteService instituteService,
         await _instituteService.UpdateAsync(id, request, userId);
 
         _logger.LogInformation("Institute updated.");
-        
+
         return Ok();
     }
 
@@ -90,7 +90,7 @@ public class InstitutesController(IInstituteService instituteService,
         await _instituteService.DeleteAsync(id);
 
         _logger.LogInformation("Institute deleted.");
-        
+
         return Ok();
     }
 }

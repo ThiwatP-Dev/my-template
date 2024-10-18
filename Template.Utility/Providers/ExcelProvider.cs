@@ -29,7 +29,7 @@ public static class ExcelProvider
     public static async Task<IEnumerable<IEnumerable<object>>> ReadAsync(IFormFile file, bool isContainHeaderRow)
     {
         using var stream = new MemoryStream();
-        
+
         await file.CopyToAsync(stream);
 
         using var workbook = new XLWorkbook(stream);
@@ -50,7 +50,7 @@ public static class ExcelProvider
 
             response.Add(columns);
         }
-        
+
         return response;
     }
 }

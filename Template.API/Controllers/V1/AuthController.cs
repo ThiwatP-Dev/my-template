@@ -27,7 +27,7 @@ public class AuthController(IAuthService authService,
         _logger.LogInformation("Login succeeded.");
 
         var userId = GetCurrentUser();
-        
+
         var location = Url.Action(nameof(LoginAsync), new { id = userId });
         return Created(location, response);
     }
@@ -50,14 +50,14 @@ public class AuthController(IAuthService authService,
         _logger.LogInformation("Login succeeded.");
 
         var userId = GetCurrentUser();
-        
+
         var location = Url.Action(nameof(LoginAsync), new { id = userId });
         return Created(location, response);
     }
 
     [Authorize(AuthenticationSchemes = CustomAuthenticationSchemeConstant.ClientSecret)]
     [HttpPost("generate-super-admin")]
-    public async Task <IActionResult> GenerateSuperAdminAsync()
+    public async Task<IActionResult> GenerateSuperAdminAsync()
     {
         _logger.LogInformation("Generate super admin.");
 

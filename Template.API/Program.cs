@@ -69,6 +69,7 @@ services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configura
 services.AddConfigOption(configuration);
 services.AddInjection();
 services.AddClient();
+services.AddAutoMapper(typeof(InstituteProfile).Assembly);
 
 services.AddCors(options =>
 {
@@ -80,8 +81,6 @@ services.AddCors(options =>
               .SetIsOriginAllowed(x => true);
     });
 });
-
-services.AddAutoMapper(typeof(InstituteProfile).Assembly);
 
 var app = builder.Build();
 

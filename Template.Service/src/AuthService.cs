@@ -103,7 +103,7 @@ public class AuthService(IUnitOfWork unitOfWork,
             {
                 throw new UnauthorizedAccessException();
             }
-            
+
             var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(payload.Email), false);
             if (user is null || string.IsNullOrEmpty(user.HashedPassword))
             {

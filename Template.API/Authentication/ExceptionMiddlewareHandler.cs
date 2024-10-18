@@ -2,8 +2,8 @@ using System.Net;
 
 namespace Template.API.Authentication;
 
-public class ExceptionMiddlewareHandler(RequestDelegate next, 
-    IHostEnvironment env, 
+public class ExceptionMiddlewareHandler(RequestDelegate next,
+    IHostEnvironment env,
     ILogger<ExceptionMiddlewareHandler> logger)
 {
     private readonly RequestDelegate _next = next;

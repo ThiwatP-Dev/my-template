@@ -22,7 +22,7 @@ public class LearnersController(IUserService userService,
         var learnerId = await _userService.CreateLearnerAsync(request, userId);
 
         _logger.LogInformation("Learner created with id {learnerId}.", learnerId);
-        
+
         var location = Url.Action(nameof(CreateAsync), new { id = learnerId });
         return Created(location, null);
     }

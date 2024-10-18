@@ -5,7 +5,7 @@ namespace Template.Utility.Extensions;
 
 public static class IQueryableExtension
 {
-    public static async Task<PagedResponse<TEntity>> GetPagedAsync<TEntity>(this IQueryable<TEntity> query, 
+    public static async Task<PagedResponse<TEntity>> GetPagedAsync<TEntity>(this IQueryable<TEntity> query,
         int page, int pageSize) where TEntity : class
     {
         if (page < 1)

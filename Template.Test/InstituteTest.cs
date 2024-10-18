@@ -1,6 +1,7 @@
+using AutoMapper;
+using Template.Service.Dto;
 using Template.Service.Interfaces;
 using Template.Service.src;
-using Template.Service.Dto;
 
 namespace Template.Test;
 
@@ -10,7 +11,7 @@ public class InstituteTest : BaseTest
 
     public InstituteTest()
     {
-        _service = new InstituteService(_unitOfWork);
+        _service = new InstituteService(_unitOfWork, _mapper);
     }
 
     [Fact]

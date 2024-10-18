@@ -6,10 +6,10 @@ public class CreateUserDto
 {
     [JsonProperty("username")]
     public required string Username { get; set; }
-    
+
     [JsonProperty("password")]
     public required string Password { get; set; }
-    
+
     [JsonProperty("firstName")]
     public required string FirstName { get; set; }
 
@@ -24,7 +24,7 @@ public class CreateLearnerDto : CreateUserDto
 {
     [JsonProperty("email")]
     public required string Email { get; set; }
-    
+
     [JsonProperty("phoneNumber")]
     public required string PhoneNumber { get; set; }
 

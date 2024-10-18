@@ -40,7 +40,7 @@ public class InstituteService(IUnitOfWork unitOfWork, IMapper mapper) : IInstitu
     {
         var institutes = await _instituteRepository.Query(isTracked: false)
                                                    .ToListAsync();
-        
+
         var response = (from institute in institutes
                         select new InstituteDto
                         {
@@ -48,7 +48,7 @@ public class InstituteService(IUnitOfWork unitOfWork, IMapper mapper) : IInstitu
                             Name = institute.Name
                         })
                        .ToList();
-        
+
         return response;
     }
 
@@ -89,7 +89,7 @@ public class InstituteService(IUnitOfWork unitOfWork, IMapper mapper) : IInstitu
 
         return response;
     }
-    
+
     public async Task UpdateAsync(Guid id, CreateInstituteDto request, Guid userId)
     {
         var institute = await _instituteRepository.GetByIdAsync(id);
@@ -117,7 +117,7 @@ public class InstituteService(IUnitOfWork unitOfWork, IMapper mapper) : IInstitu
         {
             return;
         }
-        
+
         await _unitOfWork.BeginTransactionAsync();
 
         _instituteRepository.Delete(institute);
