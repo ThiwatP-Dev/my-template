@@ -9,7 +9,6 @@ using Template.API.Configs;
 using Template.Core.Configs;
 using Template.Core.Constants;
 using Template.Database;
-using Template.Service.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -69,7 +68,6 @@ services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configura
 services.AddConfigOption(configuration);
 services.AddInjection();
 services.AddClient();
-services.AddAutoMapper(typeof(InstituteProfile).Assembly);
 
 services.AddCors(options =>
 {
