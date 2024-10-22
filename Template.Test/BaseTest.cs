@@ -19,7 +19,6 @@ public class BaseTest
             .Options;
 
         _dbContext = new DatabaseContext(options);
-        _dbContext.Database.BeginTransaction(); 
         _dbContext.Database.EnsureDeleted();
         _dbContext.Database.EnsureCreated();
 
