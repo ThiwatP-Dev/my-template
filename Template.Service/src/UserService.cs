@@ -13,6 +13,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGenericRepository<ApplicationUser> _userRepository = unitOfWork.Repository<ApplicationUser>();
     private readonly IGenericRepository<Learner> _learnerRepository = unitOfWork.Repository<Learner>();
+    private readonly IGenericRepository<Lecturer> _lecturerRepository = unitOfWork.Repository<Lecturer>();
 
     public async Task GenerateSuperAdmin()
     {
@@ -76,6 +77,42 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         await _unitOfWork.CommitAsync();
 
         return learner.Id;
+    }
+
+    public async Task<Guid> CreateLecturerAsync(CreateLecturerDto request, Guid userId)
+    {
+        var isUsernameExists = await _userRepository.AnyAsync(x => x.Username.Equals(request.Username));
+        if (isUsernameExists)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var lecturerExists = await _lecturerRepository.AnyAsync(x => x.Email.Equals(request.Email));
+        if (lecturerExists)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var hashkey = StringExtension.GenerateRandomString(10);
+        var lecturer = new Lecturer
+        {
+            Username = request.Username,
+            HashedKey = hashkey,
+            HashedPassword = request.Password.HashHMACSHA256(hashkey),
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            Email = request.Email
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        await _lecturerRepository.CreateAsync(lecturer);
+
+        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
+
+        return lecturer.Id;
     }
 
     private async Task<string> GetLearnerCode()

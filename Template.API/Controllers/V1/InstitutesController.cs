@@ -13,7 +13,7 @@ public class InstitutesController(IInstituteService instituteService,
     private readonly ILogger _logger = loggerFactory.CreateLogger<InstitutesController>();
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(CreateInstituteDto request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateInstituteDto request)
     {
         var userId = GetCurrentUser();
 

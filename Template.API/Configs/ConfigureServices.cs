@@ -18,6 +18,7 @@ public static class ConfigureServices
         services.AddScoped<IInstituteService, InstituteService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICourseService, CourseService>();
 
         return services;
     }

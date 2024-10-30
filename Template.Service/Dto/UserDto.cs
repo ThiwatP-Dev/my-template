@@ -31,3 +31,9 @@ public class CreateLearnerDto : CreateUserDto
     [JsonProperty("profileUrl")]
     public string? ProfileUrl { get; set; }
 }
+
+public class CreateLecturerDto : CreateUserDto
+{
+    [JsonProperty("email")]
+    public required string Email { get; set; }
+}
