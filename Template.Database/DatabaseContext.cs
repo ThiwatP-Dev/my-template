@@ -16,6 +16,7 @@ public class DatabaseContext : DbContext
     public DbSet<Institute> Institutes { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseLecturer> CourseLecturers { get; set; }
+    public DbSet<LearningPath> LearningPaths { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

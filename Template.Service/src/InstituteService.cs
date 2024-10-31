@@ -40,11 +40,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
                                                    .ToListAsync();
 
         var response = (from institute in institutes
-                        select new InstituteDto
-                        {
-                            Id = institute.Id,
-                            Name = institute.Name
-                        })
+                        select InstituteMapper.Map(institute))
                        .ToList();
 
         return response;
