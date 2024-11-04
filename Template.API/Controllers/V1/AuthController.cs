@@ -38,14 +38,16 @@ public class AuthController(IAuthService authService,
     {
         _logger.LogInformation("Login with google.");
 
-        if (!Request.Headers.TryGetValue("Authorization", out var authHeaderValue))
+        var authHeaderValue = Request.Headers.Authorization.FirstOrDefault();
+
+        if (string.IsNullOrEmpty(authHeaderValue))
         {
             _logger.LogError("Unauthorize.");
 
             return Unauthorized();
         }
 
-        var response = await _authService.LoginGoogleAsync(authHeaderValue!);
+        var response = await _authService.LoginGoogleAsync(authHeaderValue);
 
         _logger.LogInformation("Login succeeded.");
 
@@ -65,6 +67,26 @@ public class AuthController(IAuthService authService,
 
         _logger.LogInformation("Super admin generated.");
         var location = Url.Action(nameof(GenerateSuperAdminAsync));
+        return Created(location, null);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        _logger.LogInformation("User logout.");
+        var token = Request.Headers.Authorization.FirstOrDefault();
+
+        if (string.IsNullOrEmpty(token))
+        {
+            _logger.LogError("Unauthorize.");
+
+            return Unauthorized();
+        }
+
+        await _authService.LogoutAsync(token);
+
+        _logger.LogInformation("Logout succeeded.");
+        var location = Url.Action(nameof(Logout));
         return Created(location, null);
     }
 }

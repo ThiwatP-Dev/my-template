@@ -17,6 +17,7 @@ public class DatabaseContext : DbContext
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseLecturer> CourseLecturers { get; set; }
     public DbSet<LearningPath> LearningPaths { get; set; }
+    public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

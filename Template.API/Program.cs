@@ -11,6 +11,7 @@ using Template.API.Configs;
 using Template.Core.Configs;
 using Template.Core.Constants;
 using Template.Database;
+using Template.Service.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -54,7 +55,23 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidateAudience = true,
                 ValidAudience = jwtConfigurations.ValidAudience,
                 ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfigurations.Secret))
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = async context =>
+                {
+                    var validator = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
+                    var jti = context.Request.Headers.Authorization.FirstOrDefault()?.Replace("Bearer ", string.Empty);
+
+                    if (jti is not null && await validator.IsTokenExpiredAsync(jti))
+                    {
+                        context.Fail("Token is blacklisted.");
+                    }
+                }
             };
         });
 

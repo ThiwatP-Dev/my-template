@@ -18,9 +18,11 @@ public class AuthService(IUnitOfWork unitOfWork,
                          IOptions<JWTConfiguration> jwtConfigOptions,
                          IOptions<GoogleClientConfiguration> googleClientconfiguration) : IAuthService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly JWTConfiguration _jwtConfig = jwtConfigOptions.Value;
     private readonly GoogleClientConfiguration _googleClientConfig = googleClientconfiguration.Value;
     private readonly IGenericRepository<ApplicationUser> _userRepository = unitOfWork.Repository<ApplicationUser>();
+    private readonly IGenericRepository<BlacklistedToken> _blacklistedTokenRepository = unitOfWork.Repository<BlacklistedToken>();
 
     public async Task<AccessTokenResponseDto> LoginAsync(string username, string password)
     {
@@ -118,6 +120,34 @@ public class AuthService(IUnitOfWork unitOfWork,
         {
             throw;
         }
+    }
+
+    public async Task LogoutAsync(string token)
+    {
+        token = token.Replace("Bearer ", string.Empty);
+        if (await _blacklistedTokenRepository.AnyAsync(x => x.Token.Equals(token)))
+        {
+            return;
+        }
+
+        var blacklistedToken = new BlacklistedToken
+        {
+            Token = token
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        await _blacklistedTokenRepository.CreateAsync(blacklistedToken);
+
+        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task<bool> IsTokenExpiredAsync(string token)
+    {
+        var isTokenExpired = await _blacklistedTokenRepository.AnyAsync(x => x.Token.Equals(token));
+
+        return isTokenExpired;
     }
 
     private AccessTokenResponseDto GenerateUserToken(ApplicationUser user)
