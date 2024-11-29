@@ -10,6 +10,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
+using Template.Utility.Exceptions;
 using Template.Utility.Extensions;
 
 namespace Template.Service.src;
@@ -28,19 +29,19 @@ public class AuthService(IUnitOfWork unitOfWork,
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            throw new InvalidOperationException();
+            throw new CustomException.BadRequest("Invalid username or password");
         }
 
         var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(username), false);
         if (user is null || string.IsNullOrEmpty(user.HashedPassword))
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("User not found");
         }
 
         var isPasswordMatched = password.IsHashHMACSHA256Match(user.HashedPassword, user.HashedKey);
         if (!isPasswordMatched)
         {
-            throw new UnauthorizedAccessException();
+            throw new CustomException.Forbidden("Wrong password");
         }
 
         var response = GenerateUserToken(user);
@@ -54,7 +55,7 @@ public class AuthService(IUnitOfWork unitOfWork,
 
         if (!handler.CanReadToken(token))
         {
-            throw new InvalidOperationException();
+            throw new CustomException.BadRequest("Invalid token");
         }
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.RefreshTokenSecret));
@@ -73,14 +74,14 @@ public class AuthService(IUnitOfWork unitOfWork,
 
         if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
         {
-            throw new UnauthorizedAccessException();
+            throw new CustomException.BadRequest("Invalid user claim");
         }
 
         var user = await _userRepository.SingleOrDefaultAsync(x => x.Id == userId, false);
 
         if (user is null)
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("User not found");
         }
 
         var response = GenerateUserToken(user);
@@ -103,13 +104,13 @@ public class AuthService(IUnitOfWork unitOfWork,
 
             if (payload is null)
             {
-                throw new UnauthorizedAccessException();
+                throw new CustomException.BadRequest("Invalid payload");
             }
 
             var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(payload.Email), false);
             if (user is null || string.IsNullOrEmpty(user.HashedPassword))
             {
-                throw new KeyNotFoundException();
+                throw new CustomException.NotFound("User not found");
             }
 
             var response = GenerateUserToken(user);

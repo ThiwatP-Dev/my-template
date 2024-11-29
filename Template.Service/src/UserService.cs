@@ -4,6 +4,7 @@ using Template.Database.Enums;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Exceptions;
 using Template.Utility.Extensions;
 
 namespace Template.Service.src;
@@ -44,13 +45,13 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         var isUsernameExists = await _userRepository.AnyAsync(x => x.Username.Equals(request.Username));
         if (isUsernameExists)
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Username already exists");
         }
 
         var learnerExists = await _learnerRepository.AnyAsync(x => x.Email.Equals(request.Email));
         if (learnerExists)
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Email already exists");
         }
 
         var code = await GetLearnerCode();
@@ -84,13 +85,13 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         var isUsernameExists = await _userRepository.AnyAsync(x => x.Username.Equals(request.Username));
         if (isUsernameExists)
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Username already exists");
         }
 
         var lecturerExists = await _lecturerRepository.AnyAsync(x => x.Email.Equals(request.Email));
         if (lecturerExists)
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Email already exists");
         }
 
         var hashkey = StringExtension.GenerateRandomString(10);

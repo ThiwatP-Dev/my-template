@@ -4,6 +4,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Exceptions;
 
 namespace Template.Service.src;
 
@@ -61,7 +62,7 @@ public class LearningPathService(IUnitOfWork unitOfWork) : ILearningPathService
 
         if (path is null)
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("Path not found");
         }
 
         await _unitOfWork.BeginTransactionAsync();

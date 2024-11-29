@@ -85,6 +85,12 @@ app.UseMiddleware<ExceptionMiddlewareHandler>();
 
 app.UseAuthorization();
 
+app.Use(async (context, next) =>
+{
+    context.Request.EnableBuffering(); // Enables re-reading the request body
+    await next();
+});
+
 app.MapControllers();
 
 app.Run();

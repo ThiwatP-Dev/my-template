@@ -4,6 +4,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Exceptions;
 
 namespace Template.Service.src;
 
@@ -18,7 +19,7 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
     {
         if (await _courseRepository.AnyAsync(x => x.Code.Equals(request.Code)))
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Customer code already exists");
         }
         
         var course = new Course
@@ -67,13 +68,13 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
 
         if (course is null)
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("Course not found");
         }
 
         if (await _courseRepository.AnyAsync(x => x.Id != id
                                                   && x.Code.Equals(request.Code)))
         {
-            throw new InvalidOperationException();
+            throw new CustomException.Conflict("Course code already exists");
         }
 
         await _unitOfWork.BeginTransactionAsync();

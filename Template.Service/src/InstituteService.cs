@@ -4,6 +4,7 @@ using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Models;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
+using Template.Utility.Exceptions;
 using Template.Utility.Extensions;
 
 namespace Template.Service.src;
@@ -72,7 +73,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
         if (institute is null)
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("Institute not found");
         }
 
         var response = new InstituteDto
@@ -90,7 +91,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
         if (institute is null)
         {
-            throw new KeyNotFoundException();
+            throw new CustomException.NotFound("Institute not found");
         }
 
         await _unitOfWork.BeginTransactionAsync();

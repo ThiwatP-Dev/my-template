@@ -18,6 +18,7 @@ public static class DIConfigureServices
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ILearningPathService, LearningPathService>();
+        services.AddScoped<IErrorLogService, ErrorLogService>();
 
         return services;
     }

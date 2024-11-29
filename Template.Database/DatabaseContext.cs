@@ -10,14 +10,14 @@ public class DatabaseContext : DbContext
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
-    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-    public DbSet<Learner> Learners { get; set; }
-    public DbSet<Lecturer> Lecturers { get; set; }
-    public DbSet<Institute> Institutes { get; set; }
-    public DbSet<Course> Courses { get; set; }
-    public DbSet<CourseLecturer> CourseLecturers { get; set; }
-    public DbSet<LearningPath> LearningPaths { get; set; }
-    public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
+    public required DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public required DbSet<Learner> Learners { get; set; }
+    public required DbSet<Lecturer> Lecturers { get; set; }
+    public required DbSet<Institute> Institutes { get; set; }
+    public required DbSet<Course> Courses { get; set; }
+    public required DbSet<CourseLecturer> CourseLecturers { get; set; }
+    public required DbSet<LearningPath> LearningPaths { get; set; }
+    public required DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,7 +28,7 @@ public class DatabaseContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=THIWAT-ASUS\\SQLEXPRESS;Initial Catalog=template_db;Persist Security Info=False;User ID=sa;Password=mrtoJGHToMLBaZdibrNf3pKc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;",
+            optionsBuilder.UseSqlServer("Server=localhost,1433;Database=template;User Id=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;MultiSubnetFailover=True",
                 o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
         }
     }
