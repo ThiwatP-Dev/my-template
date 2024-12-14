@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Template.Database.Enums;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
 
@@ -17,7 +18,7 @@ public class InstitutesController(IInstituteService instituteService,
     {
         var userId = GetCurrentUser();
 
-        _logger.LogInformation("Create institute with name {name}.", request.Name);
+        _logger.LogInformation("Create institute with name {name}.", request.Localizations.SingleOrDefault(x => x.Language == LanguageCode.EN)?.Name ?? string.Empty);
 
         var instituteId = await _instituteService.CreateAsync(request, userId);
 
@@ -30,9 +31,11 @@ public class InstitutesController(IInstituteService instituteService,
     [HttpGet("search")]
     public async Task<IActionResult> SearchAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 25)
     {
+        var language = GetRequestedLanguage();
+
         _logger.LogInformation("Search institute.");
 
-        var response = await _instituteService.SearchAsync(page, pageSize);
+        var response = await _instituteService.SearchAsync(page, pageSize, language);
 
         _logger.LogInformation("Search succeeded.");
 
@@ -47,9 +50,11 @@ public class InstitutesController(IInstituteService instituteService,
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
+        var language = GetRequestedLanguage();
+        
         _logger.LogInformation("Get all institute.");
 
-        var response = await _instituteService.GetAllAsync();
+        var response = await _instituteService.GetAllAsync(language);
 
         _logger.LogInformation("Search succeeded with total items ({itemCount}).", response.Count());
 
@@ -59,9 +64,11 @@ public class InstitutesController(IInstituteService instituteService,
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id)
     {
+        var language = GetRequestedLanguage();
+
         _logger.LogInformation("Get institute by id ({id}).", id);
 
-        var respnse = await _instituteService.GetByIdAsync(id);
+        var respnse = await _instituteService.GetByIdAsync(id, language);
 
         _logger.LogInformation("Institute found.");
 

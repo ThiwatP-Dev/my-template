@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
+using Template.Database.Enums;
 using Template.Database.Models;
+using Template.Database.Models.Localizations;
 using Template.Service.Dto;
 using Template.Service.Interfaces;
 using Template.Utility.Exceptions;
@@ -13,16 +15,25 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGenericRepository<Institute> _instituteRepository = unitOfWork.Repository<Institute>();
+    private readonly IGenericRepository<InstituteLocalization> _instituteLocalizationRepository = unitOfWork.Repository<InstituteLocalization>();
 
     public async Task<Guid> CreateAsync(CreateInstituteDto request, Guid userId)
     {
+        var defaultLocale = request.Localizations.SingleOrDefault(x => x.Language == LanguageCode.EN);
         var institute = new Institute
         {
-            Name = request.Name,
+            Name = defaultLocale?.Name ?? string.Empty,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = userId,
             UpdatedAt = DateTime.UtcNow,
-            UpdatedBy = userId
+            UpdatedBy = userId,
+            Localizations = (from localization in request.Localizations
+                             select new InstituteLocalization
+                             {
+                                 Language = localization.Language,
+                                 Name = localization.Name
+                             })
+                            .ToList()
         };
 
         await _unitOfWork.BeginTransactionAsync();
@@ -35,19 +46,20 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
         return institute.Id;
     }
 
-    public async Task<IEnumerable<InstituteDto>> GetAllAsync()
+    public async Task<IEnumerable<InstituteDto>> GetAllAsync(LanguageCode language)
     {
         var institutes = await _instituteRepository.Query(isTracked: false)
+                                                   .Include(x => x.Localizations)
                                                    .ToListAsync();
 
         var response = (from institute in institutes
-                        select InstituteMapper.Map(institute))
+                        select InstituteMapper.Map(institute, language))
                        .ToList();
 
         return response;
     }
 
-    public async Task<PagedDto<InstituteDto>> SearchAsync(int page = 1, int pageSize = 25)
+    public async Task<PagedDto<InstituteDto>> SearchAsync(int page = 1, int pageSize = 25, LanguageCode language = LanguageCode.EN)
     {
         var query = GenerateQuery();
 
@@ -60,34 +72,34 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             TotalPage = pagedInstitute.TotalPage,
             TotalItem = pagedInstitute.TotalItem,
             Items = (from item in pagedInstitute.Items
-                     select InstituteMapper.Map(item))
+                     select InstituteMapper.Map(item, language))
                     .ToList()
         };
 
         return response;
     }
 
-    public async Task<InstituteDto> GetByIdAsync(Guid id)
+    public async Task<InstituteDto> GetByIdAsync(Guid id, LanguageCode language)
     {
-        var institute = await _instituteRepository.GetByIdAsync(id);
+        var institute = await _instituteRepository.Query()
+                                                  .Include(x => x.Localizations)
+                                                  .SingleOrDefaultAsync(x => x.Id == id);
 
         if (institute is null)
         {
             throw new CustomException.NotFound("Institute not found");
         }
 
-        var response = new InstituteDto
-        {
-            Id = institute.Id,
-            Name = institute.Name
-        };
+        var response = InstituteMapper.Map(institute, language);
 
         return response;
     }
 
     public async Task UpdateAsync(Guid id, CreateInstituteDto request, Guid userId)
     {
-        var institute = await _instituteRepository.GetByIdAsync(id);
+        var institute = await _instituteRepository.Query()
+                                                  .Include(x => x.Localizations)
+                                                  .SingleOrDefaultAsync(x => x.Id == id);
 
         if (institute is null)
         {
@@ -96,9 +108,19 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
         await _unitOfWork.BeginTransactionAsync();
 
-        institute.Name = request.Name;
+        _instituteLocalizationRepository.DeleleRange(institute.Localizations);
+
+        var defaultLocale = request.Localizations.SingleOrDefault(x => x.Language == LanguageCode.EN);
+        institute.Name = defaultLocale?.Name ?? string.Empty;
         institute.UpdatedAt = DateTime.UtcNow;
         institute.UpdatedBy = userId;
+        institute.Localizations = (from localization in request.Localizations
+                                   select new InstituteLocalization
+                                   {
+                                       Language = localization.Language,
+                                       Name = localization.Name
+                                   })
+                                  .ToList();
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
@@ -123,7 +145,8 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
     private IQueryable<Institute> GenerateQuery()
     {
-        var query = _instituteRepository.Query(isTracked: false);
+        IQueryable<Institute> query = _instituteRepository.Query(isTracked: false)
+                                                          .Include(x => x.Localizations);
 
         query = query.OrderBy(x => x.Name);
 
