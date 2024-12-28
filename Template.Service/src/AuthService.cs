@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Template.Core.Configs;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
+using Template.Database.Enums;
 using Template.Database.Models;
 using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
@@ -121,6 +122,51 @@ public class AuthService(IUnitOfWork unitOfWork,
         {
             throw;
         }
+    }
+
+    public async Task<AccessTokenResponseDto> LoginAzureADAsync(string token)
+    {
+        token = token.Replace("Bearer ", string.Empty);
+
+        var jwtToken = (JwtSecurityToken)new JwtSecurityTokenHandler().ReadToken(token);
+
+        var emailClaim = jwtToken.Claims.SingleOrDefault(x => x.Type == "email");
+        var firstNameClaim = jwtToken.Claims.SingleOrDefault(x => x.Type == "given_name");
+        var lastNameClaim = jwtToken.Claims.SingleOrDefault(x => x.Type == "family_name");
+
+        if (emailClaim is null)
+        {
+            throw new CustomException.BadRequest("Invalid username");
+        }
+
+        var email = emailClaim.Value;
+        var firstName = firstNameClaim?.Value ?? string.Empty;
+        var lastName = lastNameClaim?.Value ?? string.Empty;
+
+        var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(email), false);
+
+        if (user is null)
+        {
+            user = new ApplicationUser(Role.ADMIN)
+            {
+                Username = email,
+                FirstName = firstName,
+                LastName = lastName,
+                HashedKey = string.Empty,   
+                HashedPassword = string.Empty
+            };
+
+            await _unitOfWork.BeginTransactionAsync();
+
+            await _userRepository.CreateAsync(user);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();
+        }
+
+        var response = GenerateUserToken(user);
+
+        return response;
     }
 
     public async Task LogoutAsync(string token)

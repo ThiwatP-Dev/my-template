@@ -1,5 +1,7 @@
 using Template.Core.Repositories;
 using Template.Core.Repositories.Interfaces;
+using Template.Core.Storages;
+using Template.Core.Storages.Interfaces;
 using Template.Core.UnitOfWorks;
 using Template.Core.UnitOfWorks.Interfaces;
 using Template.Service.Interfaces;
@@ -19,6 +21,7 @@ public static class DIConfigureServices
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ILearningPathService, LearningPathService>();
         services.AddScoped<IErrorLogService, ErrorLogService>();
+        services.AddSingleton<IStorageHelper, BlobStorageHelper>();
 
         return services;
     }

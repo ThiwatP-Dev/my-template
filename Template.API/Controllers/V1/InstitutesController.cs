@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.Database.Enums;
 using Template.Service.Dto;
@@ -14,7 +15,7 @@ public class InstitutesController(IInstituteService instituteService,
     private readonly ILogger _logger = loggerFactory.CreateLogger<InstitutesController>();
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateInstituteDto request)
+    public async Task<IActionResult> CreateAsync([FromForm] CreateInstituteDto request)
     {
         var userId = GetCurrentUser();
 
@@ -76,7 +77,7 @@ public class InstitutesController(IInstituteService instituteService,
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync([FromRoute] Guid id, [FromBody] CreateInstituteDto request)
+    public async Task<IActionResult> UpdateAsync([FromForm] Guid id, [FromBody] CreateInstituteDto request)
     {
         var userId = GetCurrentUser();
 

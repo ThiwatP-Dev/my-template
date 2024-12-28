@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Template.Core.Configs;
 using Template.Core.Constants;
 using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
@@ -54,6 +55,31 @@ public class AuthController(IAuthService authService,
         var userId = GetCurrentUser();
 
         var location = Url.Action(nameof(LoginAsync), new { id = userId });
+        return Created(location, response);
+    }
+
+    [Authorize(AuthenticationSchemes = AzureADConfiguration.AzureAD)]
+    [HttpPost("login/azureAD")]
+    public async Task<IActionResult> LoginAzureADAsync()
+    {
+        _logger.LogInformation("Login with azure ad.");
+
+        var token = Request.Headers.Authorization.FirstOrDefault();
+
+        if (string.IsNullOrEmpty(token))
+        {
+            _logger.LogError("Unauthorize.");
+
+            return Unauthorized();
+        }
+
+        var response = await _authService.LoginAzureADAsync(token);
+
+        _logger.LogInformation("Login succeeded.");
+
+        var userId = GetCurrentUser();
+
+        var location = Url.Action(nameof(LoginAzureADAsync), new { id = userId });
         return Created(location, response);
     }
 

@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Template.API.Authentication;
 using Template.Core.Configs;
@@ -15,6 +16,7 @@ public static class ConfigureServices
     public static IServiceCollection AddConfigOption(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.Configure<JWTConfiguration>(configuration.GetSection(JWTConfiguration.JWT));
+         services.Configure<BlobStorageConfiguration>(configuration.GetSection(BlobStorageConfiguration.Blob));
         services.Configure<GoogleClientConfiguration>(settings =>
         {
             var section = configuration.GetSection(GoogleClientConfiguration.Client);
@@ -73,7 +75,8 @@ public static class ConfigureServices
                     }
                 }
             };
-        });
+        })
+        .AddMicrosoftIdentityWebApi(configuration, AzureADConfiguration.AzureAD, AzureADConfiguration.AzureAD);;
 
         var secretKeySettings = new SecretKeyConfiguration();
         configuration.GetRequiredSection(SecretKeyConfiguration.ConfigurationSettings)

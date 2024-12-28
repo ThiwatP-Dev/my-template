@@ -9,6 +9,8 @@ public class Institute : LocalizableEntity<InstituteLocalization>
 
     public required string Name { get; set; }
 
+    public Resource? Resource { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public Guid? CreatedBy { get; set; }

@@ -13,5 +13,12 @@ public class InstituteConfiguration : IEntityTypeConfiguration<Institute>
 
         builder.Property(x => x.Name)
                .HasMaxLength(1000);
+        
+        builder.OwnsOne(x => x.Resource, cb =>
+        {
+            cb.ToJson();
+            cb.Property(p => p.Type)
+              .HasColumnType("nvarchar(100)");
+        });
     }
 }

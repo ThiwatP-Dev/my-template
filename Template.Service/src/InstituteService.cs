@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Template.Core.Repositories.Interfaces;
+using Template.Core.Storages.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
@@ -11,9 +13,11 @@ using Template.Utility.Extensions;
 
 namespace Template.Service.src;
 
-public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
+public class InstituteService(IUnitOfWork unitOfWork,
+                              IStorageHelper resourceHelper) : IInstituteService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IStorageHelper _resourceHelper = resourceHelper;
     private readonly IGenericRepository<Institute> _instituteRepository = unitOfWork.Repository<Institute>();
     private readonly IGenericRepository<InstituteLocalization> _instituteLocalizationRepository = unitOfWork.Repository<InstituteLocalization>();
 
@@ -36,6 +40,13 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
                             .ToList()
         };
 
+        if (request.File is not null)
+        {
+            var resource = await _resourceHelper.UploadAsync(request.File, GetFilePath);
+            
+            institute.Resource = resource;
+        }
+
         await _unitOfWork.BeginTransactionAsync();
 
         await _instituteRepository.CreateAsync(institute);
@@ -53,7 +64,9 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
                                                    .ToListAsync();
 
         var response = (from institute in institutes
-                        select InstituteMapper.Map(institute, language))
+                        let resource = institute.Resource is null ? null 
+                                                                  : ResourceMapper.Map(institute.Resource, _resourceHelper.GetUrl(institute.Resource.Path)!)
+                        select InstituteMapper.Map(institute, resource, language))
                        .ToList();
 
         return response;
@@ -72,7 +85,9 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             TotalPage = pagedInstitute.TotalPage,
             TotalItem = pagedInstitute.TotalItem,
             Items = (from item in pagedInstitute.Items
-                     select InstituteMapper.Map(item, language))
+                     let resource = item.Resource is null ? null 
+                                                          : ResourceMapper.Map(item.Resource, _resourceHelper.GetUrl(item.Resource.Path)!)
+                     select InstituteMapper.Map(item, resource, language))
                     .ToList()
         };
 
@@ -90,7 +105,10 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
             throw new CustomException.NotFound("Institute not found");
         }
 
-        var response = InstituteMapper.Map(institute, language);
+        var resource = institute.Resource is null ? null 
+                                                  : ResourceMapper.Map(institute.Resource, _resourceHelper.GetUrl(institute.Resource.Path)!);
+
+        var response = InstituteMapper.Map(institute, resource, language);
 
         return response;
     }
@@ -112,6 +130,7 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
 
         var defaultLocale = request.Localizations.SingleOrDefault(x => x.Language == LanguageCode.EN);
         institute.Name = defaultLocale?.Name ?? string.Empty;
+        institute.Resource = null;
         institute.UpdatedAt = DateTime.UtcNow;
         institute.UpdatedBy = userId;
         institute.Localizations = (from localization in request.Localizations
@@ -121,6 +140,13 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
                                        Name = localization.Name
                                    })
                                   .ToList();
+        
+        if (request.File is not null)
+        {
+            var resource = await _resourceHelper.UploadAsync(request.File, GetFilePath);
+            
+            institute.Resource = resource;
+        }
 
         await _unitOfWork.SaveChangesAsync();
         await _unitOfWork.CommitAsync();
@@ -151,5 +177,10 @@ public class InstituteService(IUnitOfWork unitOfWork) : IInstituteService
         query = query.OrderBy(x => x.Name);
 
         return query;
+    }
+
+    private static string GetFilePath(IFormFile file)
+    {
+        return $"template/{DateTime.UtcNow:yyyyMMddHHmmssfff}{Path.GetExtension(file.FileName)}";
     }
 }
