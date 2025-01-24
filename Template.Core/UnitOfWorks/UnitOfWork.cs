@@ -54,4 +54,6 @@ public class UnitOfWork(DatabaseContext dbContext) : IUnitOfWork
     {
         return new GenericRepository<TEntity>(_dbContext);
     }
+
+    public CourseRepository CourseRepository() => new(_dbContext);
 }

@@ -22,6 +22,7 @@ public static class DIConfigureServices
         services.AddScoped<ILearningPathService, LearningPathService>();
         services.AddScoped<IErrorLogService, ErrorLogService>();
         services.AddSingleton<IStorageHelper, BlobStorageHelper>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
 
         return services;
     }

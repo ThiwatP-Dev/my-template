@@ -12,12 +12,12 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGenericRepository<Lecturer> _lecturerRepository = unitOfWork.Repository<Lecturer>();
-    private readonly IGenericRepository<Course> _courseRepository = unitOfWork.Repository<Course>();
+    private readonly ICourseRepository _courseRepository = unitOfWork.CourseRepository();
     private readonly IGenericRepository<CourseLecturer> _courseLecturerRepository = unitOfWork.Repository<CourseLecturer>();
 
     public async Task<Guid> CreateAsync(CreateCourseDto request, Guid userId)
     {
-        if (await _courseRepository.AnyAsync(x => x.Code.Equals(request.Code)))
+        if (await _courseRepository.CodeExistsAsync(request.Code))
         {
             throw new CustomException.Conflict("Customer code already exists");
         }
@@ -71,8 +71,7 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
             throw new CustomException.NotFound("Course not found");
         }
 
-        if (await _courseRepository.AnyAsync(x => x.Id != id
-                                                  && x.Code.Equals(request.Code)))
+        if (await _courseRepository.CodeExistsAsync(request.Code, id))
         {
             throw new CustomException.Conflict("Course code already exists");
         }

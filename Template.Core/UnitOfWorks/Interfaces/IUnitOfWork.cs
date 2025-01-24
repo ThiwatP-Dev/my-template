@@ -1,3 +1,4 @@
+using Template.Core.Repositories;
 using Template.Core.Repositories.Interfaces;
 
 namespace Template.Core.UnitOfWorks.Interfaces;
@@ -8,4 +9,5 @@ public interface IUnitOfWork
     Task CommitAsync();
     Task SaveChangesAsync();
     IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class;
+    CourseRepository CourseRepository();
 }

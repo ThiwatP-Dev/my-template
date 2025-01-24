@@ -9,7 +9,7 @@ namespace Template.Core.Repositories;
 public class GenericRepository<TEntity>(DatabaseContext dbContext) : IGenericRepository<TEntity> where TEntity : class
 {
     private readonly DatabaseContext _dbContext = dbContext;
-    private readonly DbSet<TEntity> _dbSet = dbContext.Set<TEntity>();
+    protected readonly DbSet<TEntity> _dbSet = dbContext.Set<TEntity>();
 
     public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
