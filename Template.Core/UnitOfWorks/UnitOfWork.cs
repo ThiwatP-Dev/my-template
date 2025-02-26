@@ -31,8 +31,6 @@ public class UnitOfWork(DatabaseContext dbContext) : IUnitOfWork
         try
         {
             await _transaction.CommitAsync();
-            _transaction.Dispose();
-            _transaction = null;
         }
         catch (Exception)
         {
@@ -42,6 +40,11 @@ public class UnitOfWork(DatabaseContext dbContext) : IUnitOfWork
             }
 
             throw;
+        }
+        finally
+        {
+            await _transaction.DisposeAsync();
+            _transaction = null;
         }
     }
 
