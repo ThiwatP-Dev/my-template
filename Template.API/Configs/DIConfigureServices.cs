@@ -23,6 +23,7 @@ public static class DIConfigureServices
         services.AddScoped<IErrorLogService, ErrorLogService>();
         services.AddSingleton<IStorageHelper, BlobStorageHelper>();
         services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<BackgroundJobService>();
 
         return services;
     }

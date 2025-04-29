@@ -19,6 +19,7 @@ public class DatabaseContext : DbContext
     public required DbSet<CourseLecturer> CourseLecturers { get; set; }
     public required DbSet<LearningPath> LearningPaths { get; set; }
     public required DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
+    public required DbSet<BackgroundJob> BackgroundJobs { get; set; }
 
     public required DbSet<InstituteLocalization> InstituteLocalizations { get; set; }
 
