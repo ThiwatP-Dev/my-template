@@ -115,4 +115,33 @@ public class AuthController(IAuthService authService,
         var location = Url.Action(nameof(Logout));
         return Created(location, null);
     }
+
+    [Authorize(AuthenticationSchemes = CustomAuthenticationSchemeConstant.ClientSecret)]
+    [HttpGet("line/url")]
+    public async Task<IActionResult> GetLineLoginUrlAsync([FromQuery] string phoneNumber)
+    {
+        _logger.LogInformation("Get line login url.");
+
+        var response = await _authService.GetLineLoginUrlAsync(phoneNumber);
+
+        _logger.LogInformation("Login url created.");
+
+        return Ok(response);
+    }
+
+    [Authorize(AuthenticationSchemes = CustomAuthenticationSchemeConstant.ClientSecret)]
+    [HttpPost("line")]
+    public async Task<IActionResult> LoginLineAsync([FromBody] LineLoginRequestDto request)
+    {
+        _logger.LogInformation("Login with line.");
+
+        var response = await _authService.LoginLineAsync(request);
+
+        _logger.LogInformation("Login succeeded.");
+
+        var userId = GetCurrentUser();
+
+        var location = Url.Action(nameof(LoginLineAsync), new { id = userId });
+        return Created(location, response);
+    }
 }

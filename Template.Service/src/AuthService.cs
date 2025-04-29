@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ using Template.Core.Repositories.Interfaces;
 using Template.Core.UnitOfWorks.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
+using Template.Service.Clients;
 using Template.Service.Dto.Authentication;
 using Template.Service.Interfaces;
 using Template.Utility.Exceptions;
@@ -18,13 +20,17 @@ namespace Template.Service.src;
 
 public class AuthService(IUnitOfWork unitOfWork,
                          IOptions<JWTConfiguration> jwtConfigOptions,
-                         IOptions<GoogleClientConfiguration> googleClientconfiguration) : IAuthService
+                         IOptions<GoogleClientConfiguration> googleClientconfiguration,
+                         IOptions<LineConfiguration> lineConfiguration,
+                         LineClient lineClient) : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly JWTConfiguration _jwtConfig = jwtConfigOptions.Value;
     private readonly GoogleClientConfiguration _googleClientConfig = googleClientconfiguration.Value;
+    private readonly LineConfiguration _lineClientConfig = lineConfiguration.Value;
     private readonly IGenericRepository<ApplicationUser> _userRepository = unitOfWork.Repository<ApplicationUser>();
     private readonly IGenericRepository<BlacklistedToken> _blacklistedTokenRepository = unitOfWork.Repository<BlacklistedToken>();
+    private readonly LineClient _lineClient = lineClient;
 
     public async Task<AccessTokenResponseDto> LoginAsync(string username, string password)
     {
@@ -169,6 +175,56 @@ public class AuthService(IUnitOfWork unitOfWork,
         return response;
     }
 
+    public async Task<AccessTokenResponseDto> LoginLineAsync(LineLoginRequestDto request)
+    {
+        var user = await _userRepository.GetByIdAsync(request.UserId);
+
+        if (user is null)
+        {
+            throw new CustomException.NotFound("User not found");
+        }
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        user.LineId = await _lineClient.GetLineIdAsync(request.AuthCode);
+
+        await _unitOfWork.SaveChangesAsync();
+
+        await _unitOfWork.CommitAsync();
+
+        var response = GenerateUserToken(user);
+
+        return response;
+    }
+
+    public async Task<string> GetLineLoginUrlAsync(string phoneNumber)
+    {
+        var user = await _userRepository.SingleOrDefaultAsync(x => x.Username.Equals(phoneNumber));
+
+        if (user is not null)
+        {
+            return ConstructLineLoginUrl(user);
+        }
+
+        user = new ApplicationUser(Role.ADMIN)
+        {
+            Username = phoneNumber,
+            FirstName = string.Empty,
+            LastName = string.Empty,
+            HashedKey = string.Empty,   
+            HashedPassword = string.Empty
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        await _userRepository.CreateAsync(user);
+
+        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
+
+        return ConstructLineLoginUrl(user);
+    }
+
     public async Task LogoutAsync(string token)
     {
         token = token.Replace("Bearer ", string.Empty);
@@ -239,5 +295,27 @@ public class AuthService(IUnitOfWork unitOfWork,
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    private string ConstructLineLoginUrl(ApplicationUser user)
+    {
+        var clientId = _lineClientConfig.ClientId;
+        var redirectUri = _lineClientConfig.RedirectUrl;
+        var nonce = Guid.NewGuid().ToString("N");
+        var scope = "profile openid email";
+        var responseType = "code";
+
+        var queryParams = HttpUtility.ParseQueryString(string.Empty);
+        queryParams["response_type"] = responseType;
+        queryParams["client_id"] = clientId;
+        queryParams["redirect_uri"] = redirectUri;
+        queryParams["state"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Id.ToString()));
+        queryParams["nonce"] = nonce;
+        queryParams["scope"] = scope;
+        queryParams["user_id"] = user.Id.ToString();
+
+        var response = $"{_lineClientConfig.Url}?{queryParams}";
+
+        return response;
     }
 }

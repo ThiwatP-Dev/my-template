@@ -16,7 +16,8 @@ public static class ConfigureServices
     public static IServiceCollection AddConfigOption(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.Configure<JWTConfiguration>(configuration.GetSection(JWTConfiguration.JWT));
-         services.Configure<BlobStorageConfiguration>(configuration.GetSection(BlobStorageConfiguration.Blob));
+        services.Configure<BlobStorageConfiguration>(configuration.GetSection(BlobStorageConfiguration.Blob));
+        services.Configure<LineConfiguration>(configuration.GetSection(LineConfiguration.Line)); 
         services.Configure<GoogleClientConfiguration>(settings =>
         {
             var section = configuration.GetSection(GoogleClientConfiguration.Client);
@@ -34,6 +35,11 @@ public static class ConfigureServices
         {
             client.BaseAddress = new Uri("https://api.example.com/");
             client.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+
+        services.AddHttpClient<LineClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.line.me/");
         });
 
         return services;

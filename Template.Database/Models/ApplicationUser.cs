@@ -18,5 +18,7 @@ public class ApplicationUser(Role role)
 
     public string? LastName { get; set; }
 
+    public string? LineId { get; set; }
+
     public Role Role { get; set; } = role;
 }
