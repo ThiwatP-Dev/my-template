@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 
 namespace Template.Utility.Providers;
@@ -26,31 +27,40 @@ public static class ExcelProvider
         return stream.ToArray();
     }
 
-    public static async Task<IEnumerable<IEnumerable<object>>> ReadAsync(IFormFile file, bool isContainHeaderRow)
+    public static async Task<Dictionary<string, IEnumerable<IEnumerable<object>>>> ReadAsync(IFormFile file, bool isContainHeaderRow)
     {
-        using var stream = new MemoryStream();
+        var result = new Dictionary<string, IEnumerable<IEnumerable<object>>>();
 
-        await file.CopyToAsync(stream);
+        using var stream = file.OpenReadStream();
+        using var reader = ExcelReaderFactory.CreateReader(stream);
 
-        using var workbook = new XLWorkbook(stream);
-        var worksheet = workbook.Worksheet(1);
-
-        var response = new List<List<object>>();
-
-        var columnUsed = worksheet.ColumnsUsed().Count();
-
-        foreach (var row in worksheet.RowsUsed().Skip(isContainHeaderRow ? 1 : 0))
+        do
         {
-            var columns = new List<object>();
+            var sheetName = reader.Name;
+            var sheetData = new List<IEnumerable<object>>();
 
-            for (var columnNumber = 1; columnNumber <= columnUsed; columnNumber++)
+            // Optionally skip header
+            if (isContainHeaderRow)
             {
-                columns.Add(row.Cell(columnNumber).Value);
+                reader.Read();
             }
 
-            response.Add(columns);
-        }
+            while (reader.Read())
+            {
+                var row = new List<object>();
 
-        return response;
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    row.Add(reader.IsDBNull(i) ? null! : reader.GetValue(i));
+                }
+
+                sheetData.Add(row);
+            }
+
+            result[sheetName] = sheetData;
+
+        } while (reader.NextResult());
+
+        return await Task.FromResult(result);
     }
 }
