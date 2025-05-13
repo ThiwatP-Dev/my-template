@@ -23,6 +23,7 @@ public static class ConfigureServices
             var section = configuration.GetSection(GoogleClientConfiguration.Client);
             settings.Audience = section.GetValue<string>(nameof(GoogleClientConfiguration.Audience))?.Split(",") ?? [];
         });
+        services.Configure<MailjetConfiguration>(configuration.GetSection(MailjetConfiguration.Mailjet));
 
         return services;
     }

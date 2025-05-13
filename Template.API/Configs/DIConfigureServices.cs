@@ -1,3 +1,5 @@
+using Template.Core.Emails;
+using Template.Core.Emails.Interfaces;
 using Template.Core.Repositories;
 using Template.Core.Repositories.Interfaces;
 using Template.Core.Storages;
@@ -24,6 +26,7 @@ public static class DIConfigureServices
         services.AddSingleton<IStorageHelper, BlobStorageHelper>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<BackgroundJobService>();
+        services.AddSingleton<IEmailHelper, EmailHelper>();
 
         return services;
     }
