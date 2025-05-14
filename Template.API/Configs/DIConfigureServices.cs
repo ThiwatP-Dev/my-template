@@ -26,7 +26,7 @@ public static class DIConfigureServices
         services.AddSingleton<IStorageHelper, BlobStorageHelper>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<BackgroundJobService>();
-        services.AddSingleton<IEmailHelper, EmailHelper>();
+        services.AddScoped<IEmailHelper, MailjetHelper>();
 
         return services;
     }

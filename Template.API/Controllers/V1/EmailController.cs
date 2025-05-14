@@ -14,7 +14,7 @@ public class EmailController(IEmailHelper emailHelper,
     [HttpGet]
     public async Task<IActionResult> SendAsync([FromQuery] string sendTo)
     {
-        await _emailHelper.SendWithTemplateAsync(sendTo, "template-mail.html");
+        await _emailHelper.SendWithTemplateAsync(sendTo, "Test Subject", "template-mail.html");
 
         _logger.LogInformation("Email send to {sendTo}", sendTo);
         

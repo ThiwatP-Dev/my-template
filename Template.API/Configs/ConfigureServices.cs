@@ -1,6 +1,8 @@
 using System.Text;
+using Mailjet.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Template.API.Authentication;
@@ -43,6 +45,14 @@ public static class ConfigureServices
             client.BaseAddress = new Uri("https://api.line.me/");
         });
 
+        services.AddHttpClient<IMailjetClient, MailjetClient>((serviceProvider, client) =>
+        {
+            client.SetDefaultSettings();
+            
+            var options = serviceProvider.GetRequiredService<IOptions<MailjetConfiguration>>().Value;
+            client.UseBasicAuthentication(options.ApiKey, options.ApiSecret);
+        });
+
         return services;
     }
 
@@ -83,7 +93,7 @@ public static class ConfigureServices
                 }
             };
         })
-        .AddMicrosoftIdentityWebApi(configuration, AzureADConfiguration.AzureAD, AzureADConfiguration.AzureAD);;
+        .AddMicrosoftIdentityWebApi(configuration, AzureADConfiguration.AzureAD, AzureADConfiguration.AzureAD);
 
         var secretKeySettings = new SecretKeyConfiguration();
         configuration.GetRequiredSection(SecretKeyConfiguration.ConfigurationSettings)
