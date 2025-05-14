@@ -18,7 +18,6 @@ public class LineClient(HttpClient httpClient,
         {
             return string.Empty;
         }
-        
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.AccessToken);
 
