@@ -24,7 +24,9 @@ public class EmailLog
 
     public DateTime? SentAt { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
+
+    public Guid CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 }

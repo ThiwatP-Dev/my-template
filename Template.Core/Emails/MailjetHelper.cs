@@ -27,14 +27,14 @@ public class MailjetHelper : IEmailHelper
         _dbContext = dbContext;
     }
 
-    public async Task SendWithTemplateAsync(string sendTo, string subject, string templateName)
+    public async Task SendWithTemplateAsync(string sendTo, string subject, string templateName, Guid requester)
     {
         var body = LoadTemplate(templateName);
 
-        await SendAsync(sendTo, subject, body, GetAttachments());
+        await SendAsync(sendTo, subject, body, GetAttachments(), requester);
     }
 
-    private async Task SendAsync(string sendTo, string subject, string body, IEnumerable<Attachment>? attachments)
+    private async Task SendAsync(string sendTo, string subject, string body, IEnumerable<Attachment>? attachments, Guid requester)
     {
         var log = new EmailLog
         {
@@ -44,6 +44,7 @@ public class MailjetHelper : IEmailHelper
             Body = body,
             Status = EmailLogStatus.PENDING,
             CreatedAt = DateTime.UtcNow,
+            CreatedBy = requester,
             Attachments = attachments is null 
                           || !attachments.Any() ? null
                                                 : string.Join(",", attachments.Select(x => x.Filename))
