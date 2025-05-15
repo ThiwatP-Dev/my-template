@@ -18,7 +18,8 @@ public class InstituteConfiguration : IEntityTypeConfiguration<Institute>
         {
             cb.ToJson();
             cb.Property(p => p.Type)
-              .HasColumnType("nvarchar(100)");
+              .HasConversion<string>()
+              .HasMaxLength(100);
         });
     }
 }
