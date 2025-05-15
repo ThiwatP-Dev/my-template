@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Template.API.Authentication;
 using Template.Core.Configs;
 using Template.Core.Constants;
+using Template.Database.Configs;
 using Template.Service.Clients;
 using Template.Service.Interfaces;
 
@@ -26,6 +27,7 @@ public static class ConfigureServices
             settings.Audience = section.GetValue<string>(nameof(GoogleClientConfiguration.Audience))?.Split(",") ?? [];
         });
         services.Configure<MailjetConfiguration>(configuration.GetSection(MailjetConfiguration.Mailjet));
+        services.Configure<CryptoConfiguration>(configuration.GetSection(CryptoConfiguration.Crypto));
 
         return services;
     }

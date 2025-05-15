@@ -27,6 +27,7 @@ public static class DIConfigureServices
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<BackgroundJobService>();
         services.AddScoped<IEmailHelper, MailjetHelper>();
+        services.AddScoped<IEncryptedRecordService, EncryptedRecordService>();
 
         return services;
     }

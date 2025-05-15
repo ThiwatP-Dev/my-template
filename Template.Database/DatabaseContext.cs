@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Template.Database.Configs;
 using Template.Database.Configurations;
 using Template.Database.Models;
 using Template.Database.Models.Localizations;
@@ -7,9 +9,18 @@ namespace Template.Database;
 
 public class DatabaseContext : DbContext
 {
-    public DatabaseContext() { }
+    private readonly string _encryptionKey;
 
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
+    public DatabaseContext()
+    {
+        _encryptionKey = string.Empty;
+    }
+
+    public DatabaseContext(DbContextOptions<DatabaseContext> options,
+                           IOptions<CryptoConfiguration> cryptoOptions) : base(options)
+    {
+        _encryptionKey = cryptoOptions.Value.SecretKey;
+    }
 
     public required DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public required DbSet<Learner> Learners { get; set; }
@@ -27,6 +38,7 @@ public class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationUserConfiguration).Assembly);
+        modelBuilder.ApplyConfiguration(new EncryptedRecordConfiguration(_encryptionKey));
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
