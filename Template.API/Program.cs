@@ -1,10 +1,12 @@
 using Asp.Versioning;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Template.API.Authentication;
 using Template.API.Configs;
 using Template.Database;
+using Template.Service.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -40,6 +42,7 @@ services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configura
 services.AddConfigOption(configuration);
 services.AddInjection();
 services.AddClient();
+services.AddValidatorsFromAssemblyContaining<ValidatedObjectDtoValidator>();
 
 services.AddCors(options =>
 {
