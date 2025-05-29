@@ -16,13 +16,9 @@ public class ValidationsController(ILoggerFactory loggerFactory) : BaseControlle
     {
         _logger.LogInformation("Begin validate object.");
 
-        var result = await validator.ValidateAsync(request);
+        await validator.ValidateAndThrowAsync(request);
 
         _logger.LogInformation("Request validated.");
-        if (!result.IsValid)
-        {
-            return BadRequest(result.Errors);
-        }
 
         return Ok();
     }

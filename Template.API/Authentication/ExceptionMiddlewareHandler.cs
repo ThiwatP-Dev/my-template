@@ -1,4 +1,6 @@
 using System.Net;
+using FluentValidation;
+using Mailjet.Client.Resources;
 using Template.Service.Interfaces;
 using Template.Utility.Exceptions;
 
@@ -35,12 +37,18 @@ public class ExceptionMiddlewareHandler(RequestDelegate next,
 
         var response = context.Response;
         var isProduction = _env.IsProduction();
+        var message = ex.Message;
         response.ContentType = "application/json";
         context.Response.ContentType = "application/json";
 
         if (ex is CustomException customException)
         {
             context.Response.StatusCode = (int)customException.StatusCode;
+        }
+        if (ex is ValidationException validationException)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            message = validationException.Errors.ElementAtOrDefault(0)?.ErrorMessage ?? "Bad request.";
         }
         else
         {
@@ -49,7 +57,7 @@ public class ExceptionMiddlewareHandler(RequestDelegate next,
 
         var result = new
         {
-            message = ex.Message,
+            message,
             stackTrace = !isProduction ? ex.StackTrace : null
         };
 
