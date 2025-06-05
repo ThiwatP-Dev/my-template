@@ -38,12 +38,14 @@ public class ExceptionMiddlewareHandler(RequestDelegate next,
         var response = context.Response;
         var isProduction = _env.IsProduction();
         var message = ex.Message;
+        object? data = null;
         response.ContentType = "application/json";
         context.Response.ContentType = "application/json";
 
         if (ex is CustomException customException)
         {
             context.Response.StatusCode = (int)customException.StatusCode;
+            data = customException.CustomData;
         }
         if (ex is ValidationException validationException)
         {
@@ -58,7 +60,8 @@ public class ExceptionMiddlewareHandler(RequestDelegate next,
         var result = new
         {
             message,
-            stackTrace = !isProduction ? ex.StackTrace : null
+            stackTrace = !isProduction ? ex.StackTrace : null,
+            data
         };
 
         await context.Response.WriteAsJsonAsync(result);
