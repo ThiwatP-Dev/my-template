@@ -28,6 +28,7 @@ public static class ConfigureServices
         });
         services.Configure<MailjetConfiguration>(configuration.GetSection(MailjetConfiguration.Mailjet));
         services.Configure<CryptoConfiguration>(configuration.GetSection(CryptoConfiguration.Crypto));
+        services.Configure<SMTPConfiguration>(configuration.GetSection(SMTPConfiguration.Configs));
 
         return services;
     }

@@ -9,11 +9,10 @@ using Template.Database.Enums;
 
 namespace Template.Core.Emails;
 
-public class MailjetHelper : IEmailHelper
+public class MailjetHelper : EmailHelper
 {
     private readonly IMailjetClient _client;
     private readonly MailjetConfiguration _configuration;
-    private readonly string _basePath;
     private readonly DatabaseContext _dbContext;
 
     public MailjetHelper(IOptions<MailjetConfiguration> configurationOptions,
@@ -22,12 +21,11 @@ public class MailjetHelper : IEmailHelper
     {
         _configuration = configurationOptions.Value;
         _client = new MailjetClient(_configuration.ApiKey, _configuration.ApiSecret);
-        _basePath = Path.Combine(AppContext.BaseDirectory, "Emails");
         _client = client;
         _dbContext = dbContext;
     }
 
-    public async Task SendWithTemplateAsync(string sendTo, string subject, string templateName, Guid requester)
+    public override async Task SendWithTemplateAsync(string sendTo, string subject, string templateName, Guid requester)
     {
         var body = LoadTemplate(templateName);
 
@@ -45,7 +43,7 @@ public class MailjetHelper : IEmailHelper
             Status = EmailLogStatus.PENDING,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = requester,
-            Attachments = attachments is null 
+            Attachments = attachments is null
                           || !attachments.Any() ? null
                                                 : string.Join(",", attachments.Select(x => x.Filename))
         };
@@ -84,22 +82,8 @@ public class MailjetHelper : IEmailHelper
         log.UpdatedAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync();
     }
-
-    private string LoadTemplate(string templateName)
-    {
-        var sharedStyles = File.ReadAllText(Path.Combine(_basePath, "Templates", "shared-styles.html"));
-        var filePath = Path.Combine(_basePath, "Templates", templateName);
-        if (!File.Exists(filePath))
-        {
-            return string.Empty;
-        }
-
-        var response = File.ReadAllText(filePath).Replace("<!-- styles-here -->", sharedStyles);;
-
-        return response;
-    }
-
-    private List<Attachment> GetAttachments()
+    
+    protected List<Attachment> GetAttachments()
     {
         var response = new List<Attachment>
         {
