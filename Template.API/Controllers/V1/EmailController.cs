@@ -5,10 +5,10 @@ namespace Template.API.Controllers.V1;
 
 [ApiController]
 [Route(BaseUrl)]
-public class EmailController(IEmailHelper emailHelper, 
+public class EmailController(EmailHelper emailHelper, 
                              ILoggerFactory loggerFactory) : BaseController
 {
-    private readonly IEmailHelper _emailHelper = emailHelper;
+    private readonly EmailHelper _emailHelper = emailHelper;
     private readonly ILogger _logger = loggerFactory.CreateLogger<EmailController>();
 
     [HttpGet]
