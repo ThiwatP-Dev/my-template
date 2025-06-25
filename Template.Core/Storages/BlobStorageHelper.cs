@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -54,7 +55,12 @@ public class BlobStorageHelper : IStorageHelper
 
         var blobClient = _containerClient.GetBlobClient(path);
 
-        await blobClient.UploadAsync(file.OpenReadStream(), true);
+        var headers = new BlobHttpHeaders
+        {
+            ContentType = file.ContentType
+        };
+
+        await blobClient.UploadAsync(file.OpenReadStream(), headers);
 
         return response;
     }
