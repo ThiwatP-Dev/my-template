@@ -1,3 +1,7 @@
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using Template.Core;
 using Template.Core.Emails;
 using Template.Core.Emails.Interfaces;
 using Template.Core.Repositories;
@@ -28,6 +32,27 @@ public static class DIConfigureServices
         services.AddScoped<BackgroundJobService>();
         services.AddScoped<EmailHelper, SMTPHelper>();
         services.AddScoped<IEncryptedRecordService, EncryptedRecordService>();
+        services.AddSingleton(provider =>
+        {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var projectId = config["Firebase:ProjectId"];
+            var credentialPath = Path.Combine(AppContext.BaseDirectory, "firebase-app.json");
+
+            return FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.FromFile(credentialPath),
+                ProjectId = projectId
+            }, projectId);
+        });
+        
+        services.AddSingleton(provider =>
+        {
+            var app = provider.GetRequiredService<FirebaseApp>();
+            return FirebaseMessaging.GetMessaging(app);
+        });
+        
+        services.AddScoped<FirebaseHelper>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         return services;
     }

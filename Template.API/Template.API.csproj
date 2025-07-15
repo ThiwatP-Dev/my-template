@@ -20,5 +20,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Template.Service\Template.Service.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="firebase-app.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

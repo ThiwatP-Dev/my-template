@@ -34,6 +34,9 @@ public class DatabaseContext : DbContext
 
     public required DbSet<InstituteLocalization> InstituteLocalizations { get; set; }
     public required DbSet<EmailLog> EmailLogs { get; set; }
+    public required DbSet<Notification> Notifications { get; set; }
+    public required DbSet<UserNotification> UserNotifications { get; set; }
+    public required DbSet<DeviceToken> DeviceTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
