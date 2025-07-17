@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using Minio;
 using Template.API.Authentication;
 using Template.Core.Configs;
 using Template.Core.Constants;
@@ -30,6 +31,15 @@ public static class ConfigureServices
         services.Configure<CryptoConfiguration>(configuration.GetSection(CryptoConfiguration.Crypto));
         services.Configure<SMTPConfiguration>(configuration.GetSection(SMTPConfiguration.Configs));
         services.Configure<FirebaseConfiguration>(configuration.GetSection(FirebaseConfiguration.Firebase));
+        var minioCSettings = new MinioConfiguration();
+        configuration.GetRequiredSection(MinioConfiguration.Minio)
+                     .Bind(minioCSettings);
+
+        services.AddMinio(configureClient => configureClient
+            .WithEndpoint(minioCSettings.Endpoint)
+            .WithCredentials(minioCSettings.AccessKey, minioCSettings.SecretKey)
+            .WithSSL(minioCSettings.Secure)
+            .Build());
 
         return services;
     }

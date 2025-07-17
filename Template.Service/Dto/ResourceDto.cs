@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Template.Core.Storages.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
 
@@ -29,11 +30,16 @@ public class ResourceDto
 
 public static class ResourceMapper
 {
-    public static ResourceDto Map(Resource model, string url)
+    public static async Task<ResourceDto?> MapAsync(Resource? model, IStorageHelper helper)
     {
+        if (model is null)
+        {
+            return null;
+        }
+
         var response = new ResourceDto
         {
-            Url = url,
+            Url = await helper.GetUrlAsync(model.Path) ?? string.Empty,
             Name = model.Name,
             Date = model.Date,
             Type = model.Type,

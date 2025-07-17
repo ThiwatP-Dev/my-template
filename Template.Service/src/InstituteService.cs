@@ -63,11 +63,10 @@ public class InstituteService(IUnitOfWork unitOfWork,
                                                    .Include(x => x.Localizations)
                                                    .ToListAsync();
 
-        var response = (from institute in institutes
-                        let resource = institute.Resource is null ? null 
-                                                                  : ResourceMapper.Map(institute.Resource, _resourceHelper.GetUrl(institute.Resource.Path)!)
-                        select InstituteMapper.Map(institute, resource, language))
-                       .ToList();
+        var response = await Task.WhenAll(
+            from institute in institutes
+            select InstituteMapper.MapAsync(institute, language, _resourceHelper)
+        );
 
         return response;
     }
@@ -84,11 +83,10 @@ public class InstituteService(IUnitOfWork unitOfWork,
             PageSize = pageSize,
             TotalPage = pagedInstitute.TotalPage,
             TotalItem = pagedInstitute.TotalItem,
-            Items = (from item in pagedInstitute.Items
-                     let resource = item.Resource is null ? null 
-                                                          : ResourceMapper.Map(item.Resource, _resourceHelper.GetUrl(item.Resource.Path)!)
-                     select InstituteMapper.Map(item, resource, language))
-                    .ToList()
+            Items = await Task.WhenAll(
+                from item in pagedInstitute.Items
+                select InstituteMapper.MapAsync(item, language, _resourceHelper)
+            )
         };
 
         return response;
@@ -105,10 +103,7 @@ public class InstituteService(IUnitOfWork unitOfWork,
             throw new CustomException.NotFound("Institute not found");
         }
 
-        var resource = institute.Resource is null ? null 
-                                                  : ResourceMapper.Map(institute.Resource, _resourceHelper.GetUrl(institute.Resource.Path)!);
-
-        var response = InstituteMapper.Map(institute, resource, language);
+        var response = await InstituteMapper.MapAsync(institute, language, _resourceHelper);
 
         return response;
     }

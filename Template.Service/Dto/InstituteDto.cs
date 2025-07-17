@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Template.Core;
+using Template.Core.Storages.Interfaces;
 using Template.Database.Enums;
 using Template.Database.Models;
 
@@ -33,14 +34,15 @@ public class InstituteDto
 
 public static class InstituteMapper
 {
-    public static InstituteDto Map(Institute model, ResourceDto? resource, LanguageCode language)
+    public static async Task<InstituteDto> MapAsync(Institute model,
+        LanguageCode language, IStorageHelper helper)
     {
         var locale = model.GetLocale(language);
         var response = new InstituteDto
         {
             Id = model.Id,
             Name = locale.Name,
-            File = resource,
+            File = await ResourceMapper.MapAsync(model.Resource, helper),
             Localizations = (from localization in model.Localizations
                              select new Localizations.InstituteDto
                              {
